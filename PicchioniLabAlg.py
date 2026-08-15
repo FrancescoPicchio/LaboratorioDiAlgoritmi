@@ -76,7 +76,7 @@ class Node:
 
 
 class LinkedList:
-    def __init__(self, head, tail):
+    def __init__(self, head=None, tail=None):
         self.head = head
         self.tail = tail
 
@@ -97,10 +97,16 @@ class LinkedList:
     # x is supposed to be data, not a Node
     def insert(self, x):
         new_node = Node(x, self, None)
-        self.tail.next = new_node
+        if self.head is not None:
+            self.tail.next = new_node
+        else:
+            self.head = new_node
         self.tail = new_node
 
     def get_max(self):
+        if self.head is None:
+            print("error: list has no elements")
+            return
         node = self.head
         current_max = node.data
         while node is not None:
@@ -110,11 +116,15 @@ class LinkedList:
         return current_max
 
     def remove_max(self):
+        if self.head is None:
+            print("error: no elements in list")
+            return
         node = self.head
         current_max_value = node.data
         current_max_node = node
         node_before_max = self.head
         previous = None
+
         while node is not None:
             if current_max_value < node.data:
                 current_max_value = node.data
@@ -146,29 +156,42 @@ class LinkedList:
 
     def print(self):
         node = self.head
-        print(node.data)
+        if node is None:
+            print("list is empty")
+            return
+        result = str(node.data)
         while node is not None:
-            print("-> " + node.data)
+            result += "-> " + str(node.data)
             node = node.next
+        print(result + " end of list")
 
 
 # Ordered Linked List
 
 
 class OrderedLinkedList:
-    def __init__(self, head, tail):
+    def __init__(self, head=None, tail=None):
         self.head = head
         self.tail = tail
 
     # x is supposed to be data, not a Node
     def insert(self, x):
+        if self.head is None:
+            new_node = Node(x, self, None)
+            self.head = new_node
+            self.tail = new_node
+            return
+
         node = self.head
         previous = None
         while node is not None:
-            if x > node.data:
+            if x >= node.data:
                 new_node = Node(x, self, node)
                 if previous is not None:
                     previous.next = new_node
+                else:
+                    self.head = new_node
+                    self.tail = node
                 return
             else:
                 previous = node
@@ -178,6 +201,9 @@ class OrderedLinkedList:
         return self.head
 
     def remove_max(self):
+        if self.head is None:
+            print("error: list has no elements")
+            return
         max = self.head
         self.head = self.head.next
         return max
@@ -194,13 +220,47 @@ class OrderedLinkedList:
             node = node.next
         print("error: couldn't find node with value " + x)
 
+    def print(self):
+        node = self.head
+        if node is None:
+            print("list is empty")
+            return
+        result = ""
+        while node is not None:
+            result += str(node.data)
+            node = node.next
+            if node is not None:
+                result += "-> "
+        print(result + " end of list")
+
 
 test = [1, 3, 2, 6, 4, 5]
 print(test)
 max_heap = Heap(test)
 max_heap.print()
-# max_heap = Heap()
-# max_heap.insert(20)
-# for i in range(5):
-#     max_heap.insert(i)
-# max_heap.print()
+
+unordered_list = LinkedList()
+elements = [1, 3, 2, 7, 4, 8, 1]
+for e in elements:
+    unordered_list.insert(e)
+unordered_list.print()
+max = unordered_list.get_max()
+print(max)
+unordered_list.print()
+
+max = unordered_list.remove_max()
+print(max)
+unordered_list.print()
+
+print("#Ordered List")
+ordered_list = OrderedLinkedList()
+for e in elements:
+    ordered_list.insert(e)
+ordered_list.print()
+max = ordered_list.get_max()
+print(max.data)
+ordered_list.print()
+
+max = ordered_list.remove_max()
+print(max.data)
+ordered_list.print()
