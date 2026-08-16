@@ -1,7 +1,4 @@
 from math import inf
-from timeit import default_timer as timer
-import random
-import matplotlib.pyplot as plt
 
 # Heap
 
@@ -111,10 +108,10 @@ class LinkedList:
             print("error: list has no elements")
             return
         node = self.head
-        current_max = node
+        current_max = node.data
         while node is not None:
-            if current_max.data < node.data:
-                current_max = node
+            if current_max < node.data:
+                current_max = node.data
             node = node.next
         return current_max
 
@@ -143,7 +140,7 @@ class LinkedList:
         else:
             self.head = current_max_node.next
 
-        return current_max_node
+        return current_max_value
 
     def increase_key(self, x, key):
         if x > key:
@@ -237,43 +234,33 @@ class OrderedLinkedList:
         print(result + " end of list")
 
 
-number_of_elements = 1000
-time_per_operation = []
-number_of_operation = range(number_of_elements)
-
-interval_start = 1
-interval_end = 300
-test = random.choices(range(interval_start, interval_end), k=number_of_elements)
+test = [1, 3, 2, 6, 4, 5]
+print(test)
 max_heap = Heap(test)
-start = timer()
-for e in test:
-    max_heap.insert(e)
-    end = timer()
-    time_per_operation.append(end - start)
-print(len(number_of_operation))
-print(len(time_per_operation))
-plt.plot(number_of_operation, time_per_operation, "r")
-plt.title("Insertion Performance")
-plt.xlabel("# insertion")
-plt.ylabel("time")
+max_heap.print()
 
 unordered_list = LinkedList()
-time_per_operation = []
-start = timer()
-for e in test:
+elements = [1, 3, 2, 7, 4, 8, 1]
+for e in elements:
     unordered_list.insert(e)
-    end = timer()
-    time_per_operation.append(end - start)
-plt.plot(number_of_operation, time_per_operation, "b")
+unordered_list.print()
+max = unordered_list.get_max()
+print(max)
+unordered_list.print()
 
+max = unordered_list.remove_max()
+print(max)
+unordered_list.print()
+
+print("#Ordered List")
 ordered_list = OrderedLinkedList()
-time_per_operation = []
-start = timer()
-for e in test:
+for e in elements:
     ordered_list.insert(e)
-    end = timer()
-    time_per_operation.append(end - start)
-plt.plot(number_of_operation, time_per_operation, "g")
+ordered_list.print()
+max = ordered_list.get_max()
+print(max.data)
+ordered_list.print()
 
-
-plt.savefig("max_heap.png")
+max = ordered_list.remove_max()
+print(max.data)
+ordered_list.print()
