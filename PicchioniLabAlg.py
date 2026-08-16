@@ -250,9 +250,8 @@ for e in test:
     max_heap.insert(e)
     end = timer()
     time_per_operation.append(end - start)
-print(len(number_of_operation))
-print(len(time_per_operation))
-plt.plot(number_of_operation, time_per_operation, "r")
+
+plt.plot(number_of_operation, time_per_operation, "r", label="Heap")
 plt.title("Insertion Performance")
 plt.xlabel("# insertion")
 plt.ylabel("time")
@@ -264,7 +263,7 @@ for e in test:
     unordered_list.insert(e)
     end = timer()
     time_per_operation.append(end - start)
-plt.plot(number_of_operation, time_per_operation, "b")
+plt.plot(number_of_operation, time_per_operation, "b", label="UnorderedLinkedList")
 
 ordered_list = OrderedLinkedList()
 time_per_operation = []
@@ -273,7 +272,7 @@ for e in test:
     ordered_list.insert(e)
     end = timer()
     time_per_operation.append(end - start)
-plt.plot(number_of_operation, time_per_operation, "g")
+plt.plot(number_of_operation, time_per_operation, "g", label="OrderedLinkedList")
 
-
+plt.legend(loc="upper left")
 plt.savefig("max_heap.png")
