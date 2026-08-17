@@ -298,30 +298,50 @@ def measure_insert_time(data, elements, output):
         output.append(end - start)
 
 
+def measure_get_max(data, n, output):
+    start = timer()
+    # _ so linters and such know that the index isn't important
+    for _ in range(n):
+        data.remove_max()
+        end = timer()
+        output.append(end - start)
+
+
 number_of_elements = 1000
 number_of_operation = range(number_of_elements)
 interval_start = 1
 interval_end = 300
-test = random.choices(range(interval_start, interval_end), k=number_of_elements)
+inputs = random.choices(range(interval_start, interval_end), k=number_of_elements)
+plt.subplot(2, 1, 1)
 
 time_per_operation = []
 max_heap = Heap()
-measure_insert_time(max_heap, test, time_per_operation)
+measure_insert_time(max_heap, inputs, time_per_operation)
 plt.plot(number_of_operation, time_per_operation, "r", label="Heap")
 
 time_per_operation = []
 unordered_list = LinkedList()
-measure_insert_time(unordered_list, test, time_per_operation)
+measure_insert_time(unordered_list, inputs, time_per_operation)
 plt.plot(number_of_operation, time_per_operation, "b", label="UnorderedLinkedList")
 
 time_per_operation = []
 ordered_list = OrderedLinkedList()
-measure_insert_time(ordered_list, test, time_per_operation)
+measure_insert_time(ordered_list, inputs, time_per_operation)
 plt.plot(number_of_operation, time_per_operation, "g", label="OrderedLinkedList")
 
 
-plt.title("Insertion Performance")
 plt.xlabel("# insertion")
 plt.ylabel("time")
 plt.legend(loc="upper left")
+
+
+plt.subplot(2, 1, 2)
+time_per_operation = []
+max_heap = Heap(inputs)
+measure_get_max(max_heap, number_of_elements, time_per_operation)
+plt.plot(number_of_operation, time_per_operation, "r", label="Heap")
+
+plt.xlabel("# removal")
+plt.ylabel("time")
+
 plt.savefig("max_heap.png")
