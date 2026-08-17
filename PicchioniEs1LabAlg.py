@@ -77,6 +77,9 @@ class Heap:
     def print(self):
         print(self.heap)
 
+    def get_len(self):
+        return len(self.heap)
+
 
 # base Node, used by both type of lists
 
@@ -152,7 +155,7 @@ class LinkedList:
 
     def remove_max(self):
         if self.head is None:
-            print("error: no elements in list")
+            # print("error: no elements in list")
             return
         node = self.head
         current_max_value = node.data
@@ -188,6 +191,14 @@ class LinkedList:
                 return
             node = node.next
         print("error: couldn't find node with value " + x)
+
+    def get_len(self):
+        node = self.head
+        i = 0
+        while node is not None:
+            i += 1
+            node = node.next
+        return i
 
     def print(self):
         node = self.head
@@ -237,6 +248,7 @@ class OrderedLinkedList:
     def remove(self, x):
         if self.head is None:
             print("error: list contains no elements")
+            return
         node = self.head
         previous = None
         while node is not None:
@@ -258,7 +270,7 @@ class OrderedLinkedList:
 
     def remove_max(self):
         if self.head is None:
-            print("error: list has no elements")
+            # print("error: list has no elements")
             return
         max = self.head
         self.head = self.head.next
@@ -275,6 +287,14 @@ class OrderedLinkedList:
                 return
             node = node.next
         print("error: couldn't find node with value " + x)
+
+    def get_len(self):
+        node = self.head
+        i = 0
+        while node is not None:
+            i += 1
+            node = node.next
+        return i
 
     def print(self):
         node = self.head
@@ -314,6 +334,7 @@ interval_end = 300
 inputs = random.choices(range(interval_start, interval_end), k=number_of_elements)
 plt.subplot(2, 1, 1)
 
+
 time_per_operation = []
 max_heap = Heap()
 measure_insert_time(max_heap, inputs, time_per_operation)
@@ -336,12 +357,28 @@ plt.legend(loc="upper left")
 
 
 plt.subplot(2, 1, 2)
+
 time_per_operation = []
 max_heap = Heap(inputs)
 measure_get_max(max_heap, number_of_elements, time_per_operation)
 plt.plot(number_of_operation, time_per_operation, "r", label="Heap")
 
+time_per_operation = []
+unordered_list = LinkedList()
+for i in range(number_of_elements):
+    unordered_list.insert(inputs[i])
+measure_get_max(unordered_list, number_of_elements, time_per_operation)
+plt.plot(number_of_operation, time_per_operation, "b", label="Heap")
+
+time_per_operation = []
+ordered_list = OrderedLinkedList()
+iterations = 0
+for i in inputs:
+    iterations += 1
+    ordered_list.insert(inputs[i])
+measure_get_max(ordered_list, number_of_elements, time_per_operation)
+plt.plot(number_of_operation, time_per_operation, "g", label="Heap")
+
 plt.xlabel("# removal")
 plt.ylabel("time")
-
 plt.savefig("max_heap.png")
