@@ -31,22 +31,6 @@ class Heap:
             self.heap[i], self.heap[largest] = self.heap[largest], self.heap[i]
             self.heapify(largest)
 
-    # def heapify(self, i):
-    #     n = len(self.heap)
-    #     left = 2 * i + 1
-    #     right = 2 * i + 2
-    #     if left < n and self.heap[left] < self.heap[i]:
-    #         max = left
-    #     else:
-    #         max = i
-    #     if right < n and self.heap[right] < self.heap[i]:
-    #         max = right
-    #     if max != i:  # else the heap is already a max-heap
-    #         swapped = self.heap[i]
-    #         self.heap[i] = self.heap[max]
-    #         self.heap[max] = swapped
-    #         self.heapify(max)
-
     def insert(self, x):
         self.heap.append(-inf)
         self.increase_key(len(self.heap) - 1, x)
@@ -135,6 +119,25 @@ class LinkedList:
             self.head = new_node
         self.tail = new_node
 
+    def remove(self, x):
+        if self.head is None:
+            print("error: list contains no elements")
+        node = self.head
+        previous = None
+        while node is not None:
+            if node.data == x:
+                if previous is None:
+                    self.head = node.next
+                else:
+                    previous.next = node.next
+                    if self.tail == node:
+                        self.tail = previous
+                return
+            else:
+                previous = node
+                node = node.next
+        print("error: no matching item to remove was found")
+
     def get_max(self):
         if self.head is None:
             print("error: list has no elements")
@@ -191,10 +194,12 @@ class LinkedList:
         if node is None:
             print("list is empty")
             return
-        result = str(node.data)
+        result = ""
         while node is not None:
-            result += "-> " + str(node.data)
+            result += str(node.data)
             node = node.next
+            if node is not None:
+                result += " -> "
         print(result + " end of list")
 
 
@@ -229,6 +234,25 @@ class OrderedLinkedList:
                 previous = node
                 node = node.next
 
+    def remove(self, x):
+        if self.head is None:
+            print("error: list contains no elements")
+        node = self.head
+        previous = None
+        while node is not None:
+            if node.data == x:
+                if previous is None:
+                    self.head = node.next
+                else:
+                    previous.next = node.next
+                    if self.tail == node:
+                        self.tail = previous
+                return
+            else:
+                previous = node
+                node = node.next
+        print("error: no matching item to remove was found")
+
     def get_max(self):
         return self.head
 
@@ -262,7 +286,7 @@ class OrderedLinkedList:
             result += str(node.data)
             node = node.next
             if node is not None:
-                result += "-> "
+                result += " -> "
         print(result + " end of list")
 
 
