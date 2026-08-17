@@ -20,25 +20,50 @@ class Heap:
 
     def heapify(self, i):
         n = len(self.heap)
-        left = 2 * i
-        right = (2 * i) + 1
+        left = 2 * i + 1
+        right = 2 * i + 2
+        largest = i
+        if left < n and self.heap[left] > self.heap[largest]:
+            largest = left
+        if right < n and self.heap[right] > self.heap[largest]:
+            largest = right
+        if largest != i:
+            self.heap[i], self.heap[largest] = self.heap[largest], self.heap[i]
+            self.heapify(largest)
 
-        if left < n and self.heap[left] < self.heap[i]:
-            max = left
-        else:
-            max = i
-        if right < n and self.heap[right] < self.heap[i]:
-            max = right
-
-        if max != i:  # else the heap is already a max-heap
-            swapped = self.heap[i]
-            self.heap[i] = self.heap[max]
-            self.heap[max] = swapped
-            self.heapify(max)
+    # def heapify(self, i):
+    #     n = len(self.heap)
+    #     left = 2 * i + 1
+    #     right = 2 * i + 2
+    #     if left < n and self.heap[left] < self.heap[i]:
+    #         max = left
+    #     else:
+    #         max = i
+    #     if right < n and self.heap[right] < self.heap[i]:
+    #         max = right
+    #     if max != i:  # else the heap is already a max-heap
+    #         swapped = self.heap[i]
+    #         self.heap[i] = self.heap[max]
+    #         self.heap[max] = swapped
+    #         self.heapify(max)
 
     def insert(self, x):
         self.heap.append(-inf)
         self.increase_key(len(self.heap) - 1, x)
+
+    def remove(self, x):
+        i = 0  # root node
+        while i < len(self.heap) and self.heap[i] != x:
+            i += 1
+        if i == len(self.heap):
+            print("couldn't find match")
+            return
+        if self.heap[i] == self.heap[-1]:
+            self.heap.pop(-1)
+            return
+        self.heap[i] = self.heap[-1]
+        self.heap.pop(-1)
+        self.heapify(i)
 
     def get_max(self):
         return self.heap[0]
@@ -46,7 +71,7 @@ class Heap:
     def remove_max(self):
         max = self.heap[0]
         self.heap[0] = self.heap[-1]
-        self.heap.remove(-1)
+        self.heap.pop(-1)
         self.heapify(0)
         return max
 
@@ -60,6 +85,10 @@ class Heap:
             self.heap[i // 2] = self.heap[i]
             self.heap[i] = swapped
             i = i // 2
+
+    # works on the index of the element, not the value
+    def is_leaf(self, i):
+        return i > (len(self.heap) // 2) and i <= len(self.heap)
 
     def print(self):
         print(self.heap)
