@@ -1,7 +1,7 @@
 from math import inf
 from timeit import default_timer as timer
-import random
 import matplotlib.pyplot as plt
+import random
 
 # Heap
 
@@ -237,42 +237,38 @@ class OrderedLinkedList:
         print(result + " end of list")
 
 
-number_of_elements = 1000
-time_per_operation = []
-number_of_operation = range(number_of_elements)
+def measure_insert_time(data, elements, output):
+    start = timer()
+    for e in elements:
+        data.insert(e)
+        end = timer()
+        output.append(end - start)
 
+
+number_of_elements = 1000
+number_of_operation = range(number_of_elements)
 interval_start = 1
 interval_end = 300
 test = random.choices(range(interval_start, interval_end), k=number_of_elements)
-max_heap = Heap(test)
-start = timer()
-for e in test:
-    max_heap.insert(e)
-    end = timer()
-    time_per_operation.append(end - start)
 
+time_per_operation = []
+max_heap = Heap()
+measure_insert_time(max_heap, test, time_per_operation)
 plt.plot(number_of_operation, time_per_operation, "r", label="Heap")
+
+time_per_operation = []
+unordered_list = LinkedList()
+measure_insert_time(unordered_list, test, time_per_operation)
+plt.plot(number_of_operation, time_per_operation, "b", label="UnorderedLinkedList")
+
+time_per_operation = []
+ordered_list = OrderedLinkedList()
+measure_insert_time(ordered_list, test, time_per_operation)
+plt.plot(number_of_operation, time_per_operation, "g", label="OrderedLinkedList")
+
+
 plt.title("Insertion Performance")
 plt.xlabel("# insertion")
 plt.ylabel("time")
-
-unordered_list = LinkedList()
-time_per_operation = []
-start = timer()
-for e in test:
-    unordered_list.insert(e)
-    end = timer()
-    time_per_operation.append(end - start)
-plt.plot(number_of_operation, time_per_operation, "b", label="UnorderedLinkedList")
-
-ordered_list = OrderedLinkedList()
-time_per_operation = []
-start = timer()
-for e in test:
-    ordered_list.insert(e)
-    end = timer()
-    time_per_operation.append(end - start)
-plt.plot(number_of_operation, time_per_operation, "g", label="OrderedLinkedList")
-
 plt.legend(loc="upper left")
 plt.savefig("max_heap.png")
