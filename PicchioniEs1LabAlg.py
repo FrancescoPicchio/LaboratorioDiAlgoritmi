@@ -327,6 +327,7 @@ def measure_get_max(data, n, output):
         output.append(end - start)
 
 
+# Generating random inputs
 number_of_elements = 1000
 number_of_operation = range(number_of_elements)
 interval_start = 1
@@ -334,6 +335,8 @@ interval_end = 300
 inputs = random.choices(range(interval_start, interval_end), k=number_of_elements)
 plt.subplot(2, 1, 1)
 
+
+# Insertion portion
 
 time_per_operation = []
 max_heap = Heap()
@@ -350,13 +353,14 @@ ordered_list = OrderedLinkedList()
 measure_insert_time(ordered_list, inputs, time_per_operation)
 plt.plot(number_of_operation, time_per_operation, "g", label="OrderedLinkedList")
 
-
+plt.title("Insertion Performance")
 plt.xlabel("# insertion")
 plt.ylabel("time")
 plt.legend(loc="upper left")
 
 
 plt.subplot(2, 1, 2)
+# Remove Max portion
 
 time_per_operation = []
 max_heap = Heap(inputs)
@@ -368,7 +372,7 @@ unordered_list = LinkedList()
 for i in range(number_of_elements):
     unordered_list.insert(inputs[i])
 measure_get_max(unordered_list, number_of_elements, time_per_operation)
-plt.plot(number_of_operation, time_per_operation, "b", label="Heap")
+plt.plot(number_of_operation, time_per_operation, "b", label="UnorderedLinkedList")
 
 time_per_operation = []
 ordered_list = OrderedLinkedList()
@@ -377,8 +381,11 @@ for i in inputs:
     iterations += 1
     ordered_list.insert(inputs[i])
 measure_get_max(ordered_list, number_of_elements, time_per_operation)
-plt.plot(number_of_operation, time_per_operation, "g", label="Heap")
+plt.plot(number_of_operation, time_per_operation, "g", label="OrderedLinkedList")
 
+plt.title("Get_Max Performance")
 plt.xlabel("# removal")
 plt.ylabel("time")
+plt.legend(loc="upper left")
+plt.tight_layout()
 plt.savefig("max_heap.png")
