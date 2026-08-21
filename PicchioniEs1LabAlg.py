@@ -310,81 +310,108 @@ class OrderedLinkedList:
         print(result + " end of list")
 
 
-def measure_insert_time(data, elements, output):
-    start = timer()
-    for e in elements:
-        data.insert(e)
-        end = timer()
-        output.append(end - start)
-
-
-def measure_get_max(data, n, output):
-    start = timer()
-    # _ so linters and such know that the index isn't important
-    for _ in range(n):
-        data.remove_max()
-        end = timer()
-        output.append(end - start)
+def measure_insert_time(data, elements, output, max, repeats):
+    for i in range(max):
+        best = inf
+        for _ in range(repeats):
+            test = data()
+            start = timer()
+            for e in elements[:i]:
+                test.insert(e)
+            end = timer()
+            best = min(best, end - start)
+        if i % 100 == 0:
+            print(i)
+        output.append(best)
 
 
 # Generating random inputs
 number_of_elements = 1000
 number_of_operation = range(number_of_elements)
 interval_start = 1
-interval_end = 300
-inputs = random.choices(range(interval_start, interval_end), k=number_of_elements)
+interval_end = 3000
+number_of_repeats = 20
+inputs = random.sample(range(interval_start, interval_end), number_of_elements)
 plt.subplot(2, 1, 1)
-
 
 # Insertion portion
 
-time_per_operation = []
-max_heap = Heap()
-measure_insert_time(max_heap, inputs, time_per_operation)
-plt.plot(number_of_operation, time_per_operation, "r", label="Heap")
 
-time_per_operation = []
-unordered_list = LinkedList()
-measure_insert_time(unordered_list, inputs, time_per_operation)
-plt.plot(number_of_operation, time_per_operation, "b", label="UnorderedLinkedList")
+time = []
+print("heap before")
+measure_insert_time(Heap, inputs, time, len(inputs), number_of_repeats)
+plt.plot(number_of_operation, time, "r", label="Heap")
+print("heap after")
 
-time_per_operation = []
-ordered_list = OrderedLinkedList()
-measure_insert_time(ordered_list, inputs, time_per_operation)
-plt.plot(number_of_operation, time_per_operation, "g", label="OrderedLinkedList")
+time = []
+print("ord list before")
+measure_insert_time(OrderedLinkedList, inputs, time, len(inputs), number_of_repeats)
+plt.plot(number_of_operation, time, "g", label="OrderedLinkedList")
+print("ord list after")
+
+time = []
+print("linked list before")
+measure_insert_time(LinkedList, inputs, time, len(inputs), number_of_repeats)
+plt.plot(number_of_operation, time, "b", label="UnorderedLinkedList")
+print("linked list after")
+
 
 plt.title("Insertion Performance")
-plt.xlabel("# insertion")
+plt.xlabel("Size")
 plt.ylabel("time")
 plt.legend(loc="upper left")
-
-
 plt.subplot(2, 1, 2)
+
 # Remove Max portion
 
-time_per_operation = []
-max_heap = Heap(inputs)
-measure_get_max(max_heap, number_of_elements, time_per_operation)
-plt.plot(number_of_operation, time_per_operation, "r", label="Heap")
+time = []
+for k in range(len(inputs)):
+    best = inf
+    for _ in range(number_of_repeats):
+        max_heap = Heap(inputs)
+        for i in inputs[:k]:
+            max_heap.insert(k)
+        start = timer()
+        max_heap.remove_max()
+        end = timer()
+        best = min(best, end - start)
+    if k % 100 == 0:
+        print(k)
+    time.append(best)
+plt.plot(number_of_operation, time, "r", label="Heap")
 
-time_per_operation = []
-unordered_list = LinkedList()
-for i in range(number_of_elements):
-    unordered_list.insert(inputs[i])
-measure_get_max(unordered_list, number_of_elements, time_per_operation)
-plt.plot(number_of_operation, time_per_operation, "b", label="UnorderedLinkedList")
+time = []
+for k in range(len(inputs)):
+    best = inf
+    for _ in range(number_of_repeats):
+        max_heap = LinkedList()
+        for i in inputs[:k]:
+            max_heap.insert(k)
+        start = timer()
+        max_heap.remove_max()
+        end = timer()
+        best = min(best, end - start)
+    if k % 100 == 0:
+        print(k)
+    time.append(best)
+plt.plot(number_of_operation, time, "b", label="UnorderedLinkedList")
 
-time_per_operation = []
-ordered_list = OrderedLinkedList()
-iterations = 0
-for i in inputs:
-    iterations += 1
-    ordered_list.insert(inputs[i])
-measure_get_max(ordered_list, number_of_elements, time_per_operation)
-plt.plot(number_of_operation, time_per_operation, "g", label="OrderedLinkedList")
+time = []
+for k in range(len(inputs)):
+    best = inf
+    for _ in range(number_of_repeats):
+        max_heap = OrderedLinkedList()
+        start = timer()
+        max_heap.remove_max()
+        end = timer()
+        best = min(best, end - start)
+    if k % 100 == 0:
+        print(k)
+    time.append(best)
+plt.plot(number_of_operation, time, "g", label="OrderedLinkedList")
 
 plt.title("Get_Max Performance")
-plt.xlabel("# removal")
+plt.xlabel("Size")
 plt.ylabel("time")
 plt.legend(loc="upper left")
 plt.tight_layout()
