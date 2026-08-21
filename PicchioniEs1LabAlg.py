@@ -372,7 +372,8 @@ for k in range(len(inputs)):
         for i in inputs[:k]:
             max_heap.insert(k)
         start = timer()
-        max_heap.remove_max()
+        for _ in range(k):
+            max_heap.remove_max()
         end = timer()
         best = min(best, end - start)
     if k % 100 == 0:
@@ -388,7 +389,8 @@ for k in range(len(inputs)):
         for i in inputs[:k]:
             max_heap.insert(k)
         start = timer()
-        max_heap.remove_max()
+        for _ in range(k):
+            max_heap.remove_max()
         end = timer()
         best = min(best, end - start)
     if k % 100 == 0:
@@ -402,7 +404,8 @@ for k in range(len(inputs)):
     for _ in range(number_of_repeats):
         max_heap = OrderedLinkedList()
         start = timer()
-        max_heap.remove_max()
+        for _ in range(k):
+            max_heap.remove_max()
         end = timer()
         best = min(best, end - start)
     if k % 100 == 0:
