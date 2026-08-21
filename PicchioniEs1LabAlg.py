@@ -311,7 +311,7 @@ class OrderedLinkedList:
 
 
 def measure_insert_time(data, elements, output, max, repeats):
-    for i in range(max):
+    for i in range(0, max, 10):
         best = inf
         for _ in range(repeats):
             test = data()
@@ -327,11 +327,11 @@ def measure_insert_time(data, elements, output, max, repeats):
 
 # Generating random inputs
 number_of_elements = 1000
-number_of_operation = range(number_of_elements)
+number_of_operation = range(0, number_of_elements, 10)
 interval_start = 1
 interval_end = 3000
 number_of_repeats = 20
-inputs = random.sample(range(interval_start, interval_end), number_of_elements)
+inputs = random.sample(range(interval_end), number_of_elements)
 plt.subplot(2, 1, 1)
 
 # Insertion portion
@@ -365,7 +365,7 @@ plt.subplot(2, 1, 2)
 # Remove Max portion
 
 time = []
-for k in range(len(inputs)):
+for k in range(0, len(inputs), 10):
     best = inf
     for _ in range(number_of_repeats):
         max_heap = Heap(inputs)
@@ -382,7 +382,7 @@ for k in range(len(inputs)):
 plt.plot(number_of_operation, time, "r", label="Heap")
 
 time = []
-for k in range(len(inputs)):
+for k in range(0, len(inputs), 10):
     best = inf
     for _ in range(number_of_repeats):
         max_heap = LinkedList()
@@ -399,7 +399,7 @@ for k in range(len(inputs)):
 plt.plot(number_of_operation, time, "b", label="UnorderedLinkedList")
 
 time = []
-for k in range(len(inputs)):
+for k in range(0, len(inputs), 10):
     best = inf
     for _ in range(number_of_repeats):
         max_heap = OrderedLinkedList()
