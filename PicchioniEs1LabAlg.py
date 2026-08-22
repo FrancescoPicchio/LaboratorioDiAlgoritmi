@@ -356,7 +356,6 @@ interval_start = 1
 interval_end = 3000
 number_of_repeats = 20
 inputs = random.sample(range(interval_end), number_of_elements)
-plt.subplot(2, 1, 1)
 
 # Insertion portion
 
@@ -384,7 +383,9 @@ plt.title("Insertion Performance")
 plt.xlabel("Size")
 plt.ylabel("time")
 plt.legend(loc="upper left")
-plt.subplot(2, 1, 2)
+plt.savefig("insertion_performance.png")
+# clears previous graph
+plt.clf()
 
 # Remove_Max portion
 
@@ -437,9 +438,9 @@ for k in range(0, len(inputs), 10):
     time.append(best)
 plt.plot(number_of_operation, time, "g", label="OrderedLinkedList")
 
-plt.title("Get_Max Performance")
+plt.title("Remove_Max Performance")
 plt.xlabel("Size")
 plt.ylabel("time")
 plt.legend(loc="upper left")
 plt.tight_layout()
-plt.savefig("max_heap.png")
+plt.savefig("remove_max_performance.png")
