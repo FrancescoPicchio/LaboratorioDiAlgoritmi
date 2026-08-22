@@ -137,7 +137,7 @@ class LinkedList:
     # x is supposed to be data, not a Node
     def insert(self, x):
         new_node = Node(x, self, None)
-        if self.head is None and self.tail is None:
+        if self.head is None:
             self.head = new_node
         else:
             self.tail.set_next(new_node)
@@ -267,7 +267,13 @@ class OrderedLinkedList:
                 return
             else:
                 previous = node
-                node = node.get_next()
+                if node.get_next() is None:
+                    new_node = Node(x, self, None)
+                    node.set_next(new_node)
+                    return
+                else:
+                    node = node.next
+        print("error: no matching item to remove was found")
 
     def remove(self, x):
         if self.head is None:
@@ -357,9 +363,8 @@ interval_end = 3000
 number_of_repeats = 20
 inputs = random.sample(range(interval_end), number_of_elements)
 
-# Insertion portion
 
-
+# Section for insert()
 time = []
 print("heap before")
 measure_insert_time(Heap, inputs, time, len(inputs), number_of_repeats)
@@ -387,15 +392,13 @@ plt.savefig("insertion_performance.png")
 # clears previous graph
 plt.clf()
 
-# Remove_Max portion
 
+# Section for remove_max()
 time = []
 for k in range(0, len(inputs), 10):
     best = inf
     for _ in range(number_of_repeats):
-        max_heap = Heap(inputs)
-        for i in inputs[:k]:
-            max_heap.insert(k)
+        max_heap = Heap(inputs[:k])
         start = timer()
         for _ in range(k):
             max_heap.remove_max()
@@ -410,12 +413,12 @@ time = []
 for k in range(0, len(inputs), 10):
     best = inf
     for _ in range(number_of_repeats):
-        max_heap = LinkedList()
+        linked_list = LinkedList()
         for i in inputs[:k]:
-            max_heap.insert(k)
+            linked_list.insert(k)
         start = timer()
         for _ in range(k):
-            max_heap.remove_max()
+            linked_list.remove_max()
         end = timer()
         best = min(best, end - start)
     if k % 100 == 0:
@@ -427,10 +430,12 @@ time = []
 for k in range(0, len(inputs), 10):
     best = inf
     for _ in range(number_of_repeats):
-        max_heap = OrderedLinkedList()
+        ordered_linked_list = OrderedLinkedList()
+        for i in inputs[:k]:
+            ordered_linked_list.insert(k)
         start = timer()
         for _ in range(k):
-            max_heap.remove_max()
+            ordered_linked_list.remove_max()
         end = timer()
         best = min(best, end - start)
     if k % 100 == 0:
@@ -442,5 +447,66 @@ plt.title("Remove_Max Performance")
 plt.xlabel("Size")
 plt.ylabel("time")
 plt.legend(loc="upper left")
-plt.tight_layout()
 plt.savefig("remove_max_performance.png")
+# clears previous graph
+plt.clf()
+
+
+# Section for remove()
+time = []
+for k in range(0, len(inputs), 10):
+    best = inf
+    to_remove = random.sample(inputs[:k], k)
+    for _ in range(number_of_repeats):
+        max_heap = Heap(inputs[:k])
+        start = timer()
+        for i in range(k):
+            max_heap.remove(to_remove[i])
+        end = timer()
+        best = min(best, end - start)
+    if k % 100 == 0:
+        print(k)
+    time.append(best)
+plt.plot(number_of_operation, time, "r", label="Heap")
+
+time = []
+for k in range(0, len(inputs), 10):
+    best = inf
+    to_remove = random.sample(inputs[:k], k)
+    for _ in range(number_of_repeats):
+        linked_list = LinkedList()
+        for input in inputs[:k]:
+            linked_list.insert(input)
+        start = timer()
+        for i in range(k):
+            linked_list.remove(to_remove[i])
+        end = timer()
+        best = min(best, end - start)
+    if k % 100 == 0:
+        print(k)
+    time.append(best)
+plt.plot(number_of_operation, time, "b", label="UnorderedLinkedList")
+
+time = []
+for k in range(0, len(inputs), 10):
+    best = inf
+    to_remove = random.sample(inputs[:k], k)
+    for _ in range(number_of_repeats):
+        ordered_linked_list = OrderedLinkedList()
+        for input in inputs[:k]:
+            ordered_linked_list.insert(input)
+        start = timer()
+        for i in range(k):
+            ordered_linked_list.remove(to_remove[i])
+        end = timer()
+        best = min(best, end - start)
+    if k % 100 == 0:
+        print(k)
+    time.append(best)
+plt.plot(number_of_operation, time, "g", label="OrderedLinkedList")
+
+plt.title("Remove Performance")
+plt.xlabel("Size")
+plt.ylabel("time")
+plt.legend(loc="upper left")
+plt.savefig("remove_performance.png")
