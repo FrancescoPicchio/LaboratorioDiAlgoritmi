@@ -1,4 +1,5 @@
 from math import inf
+from os import remove
 from timeit import default_timer as timer
 import matplotlib.pyplot as plt
 import random
@@ -60,8 +61,11 @@ class Heap:
         return max
 
     def increase_key(self, i, key):
+        if i >= len(self.heap):
+            print("index out of range")
+            return
         if key < self.heap[i]:
-            print("error: new key is smaller than the older one")
+            # print("error: new key is smaller than the older one")
             return
         self.heap[i] = key
         while i > 0 and self.heap[i // 2] < self.heap[i]:
@@ -79,6 +83,12 @@ class Heap:
 
     def get_len(self):
         return len(self.heap)
+
+    def get_value(self, i):
+        if i > len(self.heap):
+            return
+        else:
+            return self.heap[i]
 
 
 # base Node, used by both type of lists
@@ -201,17 +211,20 @@ class LinkedList:
 
         return current_max_node
 
-    def increase_key(self, x, key):
-        if x > key:
-            print("error: new key is lower than current value")
-            return
+    def increase_key(self, i, key):
         node = self.head
-        while node is not None:
-            if node.data == x:
-                node.set_data(key)
+        if node is None:
+            print("list is empty")
+            return
+        for _ in range(i):
+            if node.next is None:
+                print("index out of range")
                 return
-            node = node.get_next()
-        print("error: couldn't find node with value " + x)
+            node = node.next
+        if node.data > key:
+            # print("new key is smaller than older key")
+            return
+        node.data = key
 
     def get_len(self):
         node = self.head
@@ -220,6 +233,16 @@ class LinkedList:
             i += 1
             node = node.get_next()
         return i
+
+    def get_value(self, i):
+        if self.head is None:
+            return
+        node = self.head
+        for _ in range(i):
+            if node.get_next() is None:
+                return
+            node = node.get_next()
+        return node.get_data()
 
     def print(self):
         node = self.head
@@ -306,17 +329,21 @@ class OrderedLinkedList:
         self.head = self.head.get_next()
         return max
 
-    def increase_key(self, x, key):
-        if x > key:
-            print("error: new key is smaller than older one")
-            return
+    def increase_key(self, i, key):
         node = self.head
-        while node is not None:
-            if node.get_data() == x:
-                node.set_data(key)
+        if node is None:
+            print("list is empty")
+            return
+        for _ in range(i):
+            if node.get_next() is None:
+                print("index out of range")
                 return
             node = node.get_next()
-        print("error: couldn't find node with value " + x)
+        if node.get_data() > key:
+            # print("new key is smaller than older key")
+            return
+        self.remove(node.get_data())
+        self.insert(key)
 
     def get_len(self):
         node = self.head
@@ -325,6 +352,16 @@ class OrderedLinkedList:
             i += 1
             node = node.get_next()
         return i
+
+    def get_value(self, i):
+        if self.head is None:
+            return
+        node = self.head
+        for _ in range(i):
+            if node.get_next() is None:
+                return
+            node = node.get_next()
+        return node.get_data()
 
     def print(self):
         node = self.head
@@ -393,6 +430,28 @@ plt.savefig("insertion_performance.png")
 plt.clf()
 
 
+# TODO maybe remove this?
+# Section to compare insert() in various cases for max_heap
+time = []
+inputs = range(number_of_elements)
+measure_insert_time(Heap, inputs, time, len(inputs), number_of_repeats)
+plt.plot(number_of_operation, time, "g", label="Increasing order")
+
+time = []
+inputs = list(reversed(inputs))
+measure_insert_time(Heap, inputs, time, len(inputs), number_of_repeats)
+plt.plot(number_of_operation, time, "r", label="Decreasing order")
+
+time = []
+measure_insert_time(Heap, inputs, time, len(inputs), number_of_repeats)
+plt.plot(number_of_operation, time, "b", label="Random order")
+
+plt.title("Insertion Performance Max_heap")
+plt.xlabel("Size")
+plt.ylabel("time")
+plt.legend(loc="upper left")
+plt.savefig("max_heap_performance.png")
+
 # Section for remove_max()
 time = []
 for k in range(0, len(inputs), 10):
@@ -452,7 +511,7 @@ plt.savefig("remove_max_performance.png")
 plt.clf()
 
 
-# Section for remove()
+## Section for remove()
 time = []
 for k in range(0, len(inputs), 10):
     best = inf
@@ -510,3 +569,74 @@ plt.xlabel("Size")
 plt.ylabel("time")
 plt.legend(loc="upper left")
 plt.savefig("remove_performance.png")
+
+# FIXME make these loops into functions
+# Section for increase_key()
+time = []
+number_of_repeats = 5
+number_of_operation = range(10, number_of_elements, 10)
+for k in number_of_operation:
+    best = inf
+    for _ in range(number_of_repeats):
+        prio_queue = Heap(inputs[:k])
+        start = timer()
+        for i in range(k):
+            value = prio_queue.get_value(i)
+            if value is None:
+                value = 0
+            random_value = random.choice(range(value, interval_end))
+            prio_queue.increase_key(i, random_value)
+        end = timer()
+        best = min(best, end - start)
+    if k % 100 == 0:
+        print(k)
+    time.append(best)
+plt.plot(number_of_operation, time, "r", label="Heap")
+
+time = []
+for k in number_of_operation:
+    best = inf
+    for _ in range(number_of_repeats):
+        prio_queue = LinkedList()
+        for input in inputs[:k]:
+            prio_queue.insert(input)
+        start = timer()
+        for i in range(k):
+            value = prio_queue.get_value(i)
+            if value is None:
+                value = 0
+            random_value = random.choice(range(value, interval_end))
+            prio_queue.increase_key(i, random_value)
+        end = timer()
+        best = min(best, end - start)
+    if k % 100 == 0:
+        print(k)
+    time.append(best)
+plt.plot(number_of_operation, time, "b", label="UnorderedLinkedList")
+
+time = []
+for k in number_of_operation:
+    best = inf
+    for _ in range(number_of_repeats):
+        prio_queue = OrderedLinkedList()
+        for input in inputs[:k]:
+            prio_queue.insert(input)
+        start = timer()
+        for i in range(k):
+            value = prio_queue.get_value(i)
+            if value is None:
+                value = 0
+            random_value = random.choice(range(value, interval_end))
+            prio_queue.increase_key(i, random_value)
+        end = timer()
+        best = min(best, end - start)
+    if k % 100 == 0:
+        print(k)
+    time.append(best)
+plt.plot(number_of_operation, time, "g", label="OrderedLinkedList")
+
+plt.title("Increase_key Performance")
+plt.xlabel("Size")
+plt.ylabel("time")
+plt.legend(loc="upper left")
+plt.savefig("increase_key_performance.png")
