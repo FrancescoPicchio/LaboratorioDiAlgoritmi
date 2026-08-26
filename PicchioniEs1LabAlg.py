@@ -452,6 +452,7 @@ plt.ylabel("time")
 plt.legend(loc="upper left")
 plt.savefig("max_heap_performance.png")
 
+# TODO make section for just searching for the max
 # Section for remove_max()
 time = []
 for k in range(0, len(inputs), 10):
@@ -511,6 +512,7 @@ plt.savefig("remove_max_performance.png")
 plt.clf()
 
 
+# FIXME change remove to remove based on index, and not value
 ## Section for remove()
 time = []
 for k in range(0, len(inputs), 10):
