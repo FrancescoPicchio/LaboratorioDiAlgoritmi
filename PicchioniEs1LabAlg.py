@@ -456,33 +456,7 @@ def insert_test(test_type):
             random_test,
             test_value,
         )
-    # print("testing Heap")
-    # measure_insert_time(
-    #     1, step, inputs, time, number_of_repeats, random_test, test_value
-    # )
-    # plt.plot(number_of_operation, time, "r", label="Heap")
-    # print("finished testing Heap")
-    #
-    # time = []
-    # print("testing OrderedLinkedList")
-    # measure_insert_time(
-    #     OrderedLinkedList,
-    #     step,
-    #     inputs,
-    #     time,
-    #     number_of_repeats,
-    #     random_test,
-    #     test_value,
-    # )
-    # plt.plot(number_of_operation, time, "g", label="OrderedLinkedList")
-    # print("finished testing OrderedLinkedList")
-    #
-    # time = []
-    # print("testing LinkedList")
-    # measure_insert_time(
-    #     LinkedList, step, inputs, time, number_of_repeats, random_test, test_value
-    # )
-    # plt.plot(number_of_operation, time, "b", label="UnorderedLinkedList")
+
     print("finished testing LinkedList")
     plt.title("Insertion Performance, " + test_type_string + " value")
     plt.xlabel("Size")
@@ -534,21 +508,28 @@ def increase_key_test(data_type):
     for k in number_of_operation:
         best = inf
         for _ in range(number_of_repeats):
-            prio_queue = Heap(inputs[:k])
+            if data_type == 0:
+                prio_queue = Heap()
+            elif data_type == 1:
+                prio_queue = OrderedLinkedList()
+            else:
+                prio_queue = LinkedList()
+            for _ in inputs[:k]:
+                prio_queue.insert(k)
+
+            # random_index = random.choice(range(k))
+            random_index = k - 1
+            value = prio_queue.get_value(random_index)
+            if value is None:
+                value = 0
+            random_value = random.choice(range(value, interval_end))
             start = timer()
-            for i in range(k):
-                value = prio_queue.get_value(i)
-                if value is None:
-                    value = 0
-                random_value = random.choice(range(value, interval_end))
-                prio_queue.increase_key(i, random_value)
+            prio_queue.increase_key(random_index, random_value)
             end = timer()
             best = min(best, end - start)
-        if k % 100 == 0:
-            print(k)
         time.append(best)
 
-    plot_graph(data_type, time, number_of_operation)
+    plot_graph(data_type, number_of_operation, time)
 
 
 print("Testing Insertion cases")
@@ -565,6 +546,18 @@ plt.ylabel("time")
 plt.legend(loc="upper left")
 plt.savefig("remove_max_performance.png")
 plt.clf()
+
+print("Testing Increase_key")
+for i in range(3):
+    increase_key_test(i)
+
+plt.title("Increase_key Performance")
+plt.xlabel("Size")
+plt.ylabel("time")
+plt.legend(loc="upper left")
+plt.savefig("increase_key_performance.png")
+plt.clf()
+
 # # TODO maybe remove this?
 # # Section to compare insert() in various cases for max_heap
 # time = []
@@ -588,74 +581,3 @@ plt.clf()
 # plt.savefig("max_heap_performance.png")
 #
 # TODO make section for just searching for the max
-
-# # FIXME make these loops into functions
-# # Section for increase_key()
-# time = []
-# number_of_repeats = 5
-# number_of_operation = range(10, number_of_elements, 10)
-# for k in number_of_operation:
-#     best = inf
-#     for _ in range(number_of_repeats):
-#         prio_queue = Heap(inputs[:k])
-#         start = timer()
-#         for i in range(k):
-#             value = prio_queue.get_value(i)
-#             if value is None:
-#                 value = 0
-#             random_value = random.choice(range(value, interval_end))
-#             prio_queue.increase_key(i, random_value)
-#         end = timer()
-#         best = min(best, end - start)
-#     if k % 100 == 0:
-#         print(k)
-#     time.append(best)
-# plt.plot(number_of_operation, time, "r", label="Heap")
-#
-# time = []
-# for k in number_of_operation:
-#     best = inf
-#     for _ in range(number_of_repeats):
-#         prio_queue = LinkedList()
-#         for input in inputs[:k]:
-#             prio_queue.insert(input)
-#         start = timer()
-#         for i in range(k):
-#             value = prio_queue.get_value(i)
-#             if value is None:
-#                 value = 0
-#             random_value = random.choice(range(value, interval_end))
-#             prio_queue.increase_key(i, random_value)
-#         end = timer()
-#         best = min(best, end - start)
-#     if k % 100 == 0:
-#         print(k)
-#     time.append(best)
-# plt.plot(number_of_operation, time, "b", label="UnorderedLinkedList")
-#
-# time = []
-# for k in number_of_operation:
-#     best = inf
-#     for _ in range(number_of_repeats):
-#         prio_queue = OrderedLinkedList()
-#         for input in inputs[:k]:
-#             prio_queue.insert(input)
-#         start = timer()
-#         for i in range(k):
-#             value = prio_queue.get_value(i)
-#             if value is None:
-#                 value = 0
-#             random_value = random.choice(range(value, interval_end))
-#             prio_queue.increase_key(i, random_value)
-#         end = timer()
-#         best = min(best, end - start)
-#     if k % 100 == 0:
-#         print(k)
-#     time.append(best)
-# plt.plot(number_of_operation, time, "g", label="OrderedLinkedList")
-#
-# plt.title("Increase_key Performance")
-# plt.xlabel("Size")
-# plt.ylabel("time")
-# plt.legend(loc="upper left")
-# plt.savefig("increase_key_performance.png")
