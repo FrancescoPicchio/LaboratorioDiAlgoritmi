@@ -377,30 +377,52 @@ class OrderedLinkedList:
         print(result)
 
 
-def measure_insert_time(data, step, elements, output, repeats, random_test, test_value):
-    for i in range(0, len(elements), step):
+def plot_graph(data_type, number_of_operation, time):
+    if data_type == 0:
+        label = "Heap"
+        color = "r"
+    elif data_type == 1:
+        label = "OrderedLinkedList"
+        color = "g"
+    else:
+        label = "LinkedList"
+        color = "b"
+    plt.plot(number_of_operation, time, color, label=label)
+    print("finished testing for " + label)
+
+
+def measure_insert_time(
+    data_type, number_of_operation, elements, time, repeats, random_test, test_value
+):
+    for i in number_of_operation:
         best = inf
         for _ in range(repeats):
-            test = data()
+            if data_type == 0:
+                prio_queue = Heap()
+            elif data_type == 1:
+                prio_queue = OrderedLinkedList()
+            else:
+                prio_queue = LinkedList()
             for e in elements[:i]:
-                test.insert(e)
+                prio_queue.insert(e)
+
             if random_test is True:
                 random_value = random.choice(range(test_value))
             else:
                 random_value = test_value
+
             start = timer()
-            test.insert(random_value)
+            prio_queue.insert(random_value)
             end = timer()
             best = min(best, end - start)
-        if i % 100 == 0:
-            print(i)
-        output.append(best)
+        time.append(best)
+    plot_graph(data_type, number_of_operation, time)
 
 
 def insert_test(test_type):
     number_of_elements = 3000
     step = 100
-    number_of_operation = range(0, number_of_elements, step)
+    number_of_operation = range(step, number_of_elements, step)
     interval_end = 3000
     number_of_repeats = 10
     inputs = random.choices(range(interval_end), k=number_of_elements)
@@ -423,83 +445,126 @@ def insert_test(test_type):
     else:
         print("testing insertion of a random value")
 
-    time = []
-    print("testing Heap")
-    measure_insert_time(
-        Heap, step, inputs, time, number_of_repeats, random_test, test_value
-    )
-    plt.plot(number_of_operation, time, "r", label="Heap")
-    print("finished testing Heap")
-
-    time = []
-    print("testing OrderedLinkedList")
-    measure_insert_time(
-        OrderedLinkedList,
-        step,
-        inputs,
-        time,
-        number_of_repeats,
-        random_test,
-        test_value,
-    )
-    plt.plot(number_of_operation, time, "g", label="OrderedLinkedList")
-    print("finished testing OrderedLinkedList")
-
-    time = []
-    print("testing LinkedList")
-    measure_insert_time(
-        LinkedList, step, inputs, time, number_of_repeats, random_test, test_value
-    )
-    plt.plot(number_of_operation, time, "b", label="UnorderedLinkedList")
+    for i in range(3):
+        time = []
+        measure_insert_time(
+            i,
+            number_of_operation,
+            inputs,
+            time,
+            number_of_repeats,
+            random_test,
+            test_value,
+        )
+    # print("testing Heap")
+    # measure_insert_time(
+    #     1, step, inputs, time, number_of_repeats, random_test, test_value
+    # )
+    # plt.plot(number_of_operation, time, "r", label="Heap")
+    # print("finished testing Heap")
+    #
+    # time = []
+    # print("testing OrderedLinkedList")
+    # measure_insert_time(
+    #     OrderedLinkedList,
+    #     step,
+    #     inputs,
+    #     time,
+    #     number_of_repeats,
+    #     random_test,
+    #     test_value,
+    # )
+    # plt.plot(number_of_operation, time, "g", label="OrderedLinkedList")
+    # print("finished testing OrderedLinkedList")
+    #
+    # time = []
+    # print("testing LinkedList")
+    # measure_insert_time(
+    #     LinkedList, step, inputs, time, number_of_repeats, random_test, test_value
+    # )
+    # plt.plot(number_of_operation, time, "b", label="UnorderedLinkedList")
     print("finished testing LinkedList")
     plt.title("Insertion Performance, " + test_type_string + " value")
     plt.xlabel("Size")
     plt.ylabel("time")
     plt.legend(loc="upper left")
     plt.savefig("insertion_performance_" + test_type_string + ".png")
-    # clears previous graph
     plt.clf()
+
+
+def remove_max_test(data_type):
+    number_of_elements = 3000
+    step = 100
+    number_of_operation = range(step, number_of_elements, step)
+    interval_end = 3000
+    number_of_repeats = 100
+    inputs = random.choices(range(interval_end), k=number_of_elements)
+
+    time = []
+    for k in number_of_operation:
+        best = inf
+        for _ in range(number_of_repeats):
+            if data_type == 0:
+                prio_queue = Heap()
+            elif data_type == 1:
+                prio_queue = OrderedLinkedList()
+            else:
+                prio_queue = LinkedList()
+            for _ in inputs[:k]:
+                prio_queue.insert(k)
+
+            start = timer()
+            prio_queue.remove_max()
+            end = timer()
+            best = min(best, end - start)
+        time.append(best)
+
+    plot_graph(data_type, number_of_operation, time)
+
+
+def increase_key_test(data_type):
+    number_of_elements = 3000
+    step = 100
+    number_of_operation = range(step, number_of_elements, step)
+    interval_end = 3000
+    number_of_repeats = 100
+    inputs = random.choices(range(interval_end), k=number_of_elements)
+    time = []
+
+    for k in number_of_operation:
+        best = inf
+        for _ in range(number_of_repeats):
+            prio_queue = Heap(inputs[:k])
+            start = timer()
+            for i in range(k):
+                value = prio_queue.get_value(i)
+                if value is None:
+                    value = 0
+                random_value = random.choice(range(value, interval_end))
+                prio_queue.increase_key(i, random_value)
+            end = timer()
+            best = min(best, end - start)
+        if k % 100 == 0:
+            print(k)
+        time.append(best)
+
+    plot_graph(data_type, time, number_of_operation)
 
 
 print("Testing Insertion cases")
 for i in range(3):
     insert_test(i)
 
+print("Testing Remove_Max")
+for i in range(3):
+    remove_max_test(i)
 
-# Generating random inputs
-
-
-# # Section for insert()
-# time = []
-# print("heap before")
-# measure_insert_time(Heap, step, inputs, time, number_of_repeats, interval_end)
-# plt.plot(number_of_operation, time, "r", label="Heap")
-# print("heap after")
-#
-# time = []
-# print("ord list before")
-# measure_insert_time(
-#     OrderedLinkedList, step, inputs, time, number_of_repeats, interval_end
-# )
-# plt.plot(number_of_operation, time, "g", label="OrderedLinkedList")
-# print("ord list after")
-#
-# time = []
-# print("linked list before")
-# measure_insert_time(LinkedList, step, inputs, time, number_of_repeats, interval_end)
-# plt.plot(number_of_operation, time, "b", label="UnorderedLinkedList")
-# print("linked list after")
-#
-#
-# plt.title("Insertion Performance")
-# plt.xlabel("Size")
-# plt.ylabel("time")
-# plt.legend(loc="upper left")
-# plt.savefig("insertion_performance.png")
-# # clears previous graph
-# plt.clf()
-#
-#
+plt.title("Remove_Max Performance")
+plt.xlabel("Size")
+plt.ylabel("time")
+plt.legend(loc="upper left")
+plt.savefig("remove_max_performance.png")
+plt.clf()
 # # TODO maybe remove this?
 # # Section to compare insert() in various cases for max_heap
 # time = []
@@ -523,125 +588,7 @@ for i in range(3):
 # plt.savefig("max_heap_performance.png")
 #
 # TODO make section for just searching for the max
-# Section for remove_max()
-# time = []
-# for k in range(0, len(inputs), 10):
-#     best = inf
-#     for _ in range(number_of_repeats):
-#         max_heap = Heap(inputs[:k])
-#         start = timer()
-#         for _ in range(k):
-#             max_heap.remove_max()
-#         end = timer()
-#         best = min(best, end - start)
-#     if k % 100 == 0:
-#         print(k)
-#     time.append(best)
-# plt.plot(number_of_operation, time, "r", label="Heap")
-#
-# time = []
-# for k in range(0, len(inputs), 10):
-#     best = inf
-#     for _ in range(number_of_repeats):
-#         linked_list = LinkedList()
-#         for i in inputs[:k]:
-#             linked_list.insert(k)
-#         start = timer()
-#         for _ in range(k):
-#             linked_list.remove_max()
-#         end = timer()
-#         best = min(best, end - start)
-#     if k % 100 == 0:
-#         print(k)
-#     time.append(best)
-# plt.plot(number_of_operation, time, "b", label="UnorderedLinkedList")
-#
-# time = []
-# for k in range(0, len(inputs), 10):
-#     best = inf
-#     for _ in range(number_of_repeats):
-#         ordered_linked_list = OrderedLinkedList()
-#         for i in inputs[:k]:
-#             ordered_linked_list.insert(k)
-#         start = timer()
-#         for _ in range(k):
-#             ordered_linked_list.remove_max()
-#         end = timer()
-#         best = min(best, end - start)
-#     if k % 100 == 0:
-#         print(k)
-#     time.append(best)
-# plt.plot(number_of_operation, time, "g", label="OrderedLinkedList")
-#
-# plt.title("Remove_Max Performance")
-# plt.xlabel("Size")
-# plt.ylabel("time")
-# plt.legend(loc="upper left")
-# plt.savefig("remove_max_performance.png")
-# # clears previous graph
-# plt.clf()
-#
-#
-# # FIXME change remove to remove based on index, and not value
-# ## Section for remove()
-# time = []
-# for k in range(0, len(inputs), 10):
-#     best = inf
-#     to_remove = random.sample(inputs[:k], k)
-#     for _ in range(number_of_repeats):
-#         max_heap = Heap(inputs[:k])
-#         start = timer()
-#         for i in range(k):
-#             max_heap.remove(to_remove[i])
-#         end = timer()
-#         best = min(best, end - start)
-#     if k % 100 == 0:
-#         print(k)
-#     time.append(best)
-# plt.plot(number_of_operation, time, "r", label="Heap")
-#
-# time = []
-# for k in range(0, len(inputs), 10):
-#     best = inf
-#     to_remove = random.sample(inputs[:k], k)
-#     for _ in range(number_of_repeats):
-#         linked_list = LinkedList()
-#         for input in inputs[:k]:
-#             linked_list.insert(input)
-#         start = timer()
-#         for i in range(k):
-#             linked_list.remove(to_remove[i])
-#         end = timer()
-#         best = min(best, end - start)
-#     if k % 100 == 0:
-#         print(k)
-#     time.append(best)
-# plt.plot(number_of_operation, time, "b", label="UnorderedLinkedList")
-#
-# time = []
-# for k in range(0, len(inputs), 10):
-#     best = inf
-#     to_remove = random.sample(inputs[:k], k)
-#     for _ in range(number_of_repeats):
-#         ordered_linked_list = OrderedLinkedList()
-#         for input in inputs[:k]:
-#             ordered_linked_list.insert(input)
-#         start = timer()
-#         for i in range(k):
-#             ordered_linked_list.remove(to_remove[i])
-#         end = timer()
-#         best = min(best, end - start)
-#     if k % 100 == 0:
-#         print(k)
-#     time.append(best)
-# plt.plot(number_of_operation, time, "g", label="OrderedLinkedList")
-#
-# plt.title("Remove Performance")
-# plt.xlabel("Size")
-# plt.ylabel("time")
-# plt.legend(loc="upper left")
-# plt.savefig("remove_performance.png")
-#
+
 # # FIXME make these loops into functions
 # # Section for increase_key()
 # time = []
