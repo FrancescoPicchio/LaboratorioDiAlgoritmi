@@ -1,10 +1,7 @@
-from math import inf
+from math import inf, log, ceil
 from timeit import default_timer as timer
 import matplotlib.pyplot as plt
 import random
-
-
-# Heap
 
 
 class Heap:
@@ -65,21 +62,30 @@ class Heap:
             print("index out of range")
             return
         if key < self.heap[i]:
-            # print("error: new key is smaller than the older one")
             return
         self.heap[i] = key
-        while i > 0 and self.heap[i // 2] < self.heap[i]:
-            swapped = self.heap[i // 2]
-            self.heap[i // 2] = self.heap[i]
+        while i > 0 and self.heap[(i - 1) // 2] < self.heap[i]:
+            swapped = self.heap[(i - 1) // 2]
+            self.heap[(i - 1) // 2] = self.heap[i]
             self.heap[i] = swapped
-            i = i // 2
+            i = (i - 1) // 2
 
     # works on the index of the element, not the value
     def is_leaf(self, i):
         return i > (len(self.heap) // 2) and i <= len(self.heap)
 
     def print(self):
-        print(self.heap)
+        num_of_levels = log(len(self.heap), 2)
+        num_of_levels = ceil(num_of_levels)
+        start = 1
+        for i in range(1, num_of_levels + 1):
+            max = 2 ** (i)
+            for j in range(start, max):
+                if j > len(self.heap):
+                    break
+                print(self.heap[j - 1], end=", ")
+            print("")
+            start = max
 
     def get_len(self):
         return len(self.heap)
@@ -89,9 +95,6 @@ class Heap:
             return
         else:
             return self.heap[i]
-
-
-# base Node, used by both type of lists
 
 
 class Node:
@@ -117,9 +120,6 @@ class Node:
 
     def set_next(self, new_next):
         self.next = new_next
-
-
-# Unordered Linked List
 
 
 class LinkedList:
@@ -208,7 +208,6 @@ class LinkedList:
             node_before_max.set_next(current_max_node.get_next())
         else:
             self.head = current_max_node.get_next()
-
         return current_max_node
 
     def increase_key(self, i, key):
@@ -222,7 +221,6 @@ class LinkedList:
                 return
             node = node.next
         if node.data > key:
-            # print("new key is smaller than older key")
             return
         node.data = key
 
@@ -256,9 +254,6 @@ class LinkedList:
             if node is not None:
                 result += " -> "
         print(result + " end of list")
-
-
-# Ordered Linked List
 
 
 class OrderedLinkedList:
@@ -323,7 +318,6 @@ class OrderedLinkedList:
 
     def remove_max(self):
         if self.head is None:
-            # print("error: list has no elements")
             return
         max = self.head
         self.head = self.head.get_next()
@@ -340,7 +334,6 @@ class OrderedLinkedList:
                 return
             node = node.get_next()
         if node.get_data() > key:
-            # print("new key is smaller than older key")
             return
         self.remove(node.get_data())
         self.insert(key)
@@ -435,15 +428,15 @@ def insert_test(test_type):
     if test_type == 1:
         random_test = False
         test_type_string = "highest"
-        print("testing insertion of highest value")
+        print("## Testing insertion of highest value")
     # Testing insertion of lowest value
     elif test_type == 2:
         random_test = False
         test_value = 1
         test_type_string = "lowest"
-        print("testing insertion of lowest value")
+        print("## Testing insertion of lowest value")
     else:
-        print("testing insertion of a random value")
+        print("## Testing insertion of a random value")
 
     for i in range(3):
         time = []
@@ -457,7 +450,6 @@ def insert_test(test_type):
             test_value,
         )
 
-    print("finished testing LinkedList")
     plt.title("Insertion Performance, " + test_type_string + " value")
     plt.xlabel("Size")
     plt.ylabel("time")
@@ -517,6 +509,7 @@ def increase_key_test(data_type):
             for _ in inputs[:k]:
                 prio_queue.insert(k)
 
+            # TODO decide which test makes more sense. probably the worst case scenario
             # random_index = random.choice(range(k))
             random_index = k - 1
             value = prio_queue.get_value(random_index)
@@ -532,22 +525,25 @@ def increase_key_test(data_type):
     plot_graph(data_type, number_of_operation, time)
 
 
-print("Testing Insertion cases")
+# also do a graph for highest/lowest between Heap and LinkedList
+print("# Testing Insertion cases")
 for i in range(3):
     insert_test(i)
 
-print("Testing Remove_Max")
+# test if remove_max works correctly
+print("# Testing Remove_Max")
 for i in range(3):
     remove_max_test(i)
 
-plt.title("Remove_Max Performance")
+# also make a graph for only heap and OrderedLinkedList
+plt.title("# Remove_Max Performance")
 plt.xlabel("Size")
 plt.ylabel("time")
 plt.legend(loc="upper left")
 plt.savefig("remove_max_performance.png")
 plt.clf()
 
-print("Testing Increase_key")
+print("# Testing Increase_key")
 for i in range(3):
     increase_key_test(i)
 
