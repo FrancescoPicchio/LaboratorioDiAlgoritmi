@@ -64,21 +64,24 @@ class Heap:
         if key < self.heap[i]:
             return
         self.heap[i] = key
-        while i > 0 and self.heap[(i - 1) // 2] < self.heap[i]:
-            swapped = self.heap[(i - 1) // 2]
-            self.heap[(i - 1) // 2] = self.heap[i]
+        while i > 0 and self.heap[self.get_parent(i)] < self.heap[i]:
+            swapped = self.heap[self.get_parent(i)]
+            self.heap[self.get_parent(i)] = self.heap[i]
             self.heap[i] = swapped
-            i = (i - 1) // 2
+            i = self.get_parent(i)
 
     # works on the index of the element, not the value
     def is_leaf(self, i):
         return i > (len(self.heap) // 2) and i <= len(self.heap)
 
+    def get_parent(self, i):
+        return (i - 1) // 2
+
     def print(self):
         num_of_levels = log(len(self.heap), 2)
         num_of_levels = ceil(num_of_levels)
         start = 1
-        for i in range(1, num_of_levels + 1):
+        for i in range(1, num_of_levels + 2):
             max = 2 ** (i)
             for j in range(start, max):
                 if j > len(self.heap):
