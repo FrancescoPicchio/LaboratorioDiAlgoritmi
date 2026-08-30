@@ -408,17 +408,14 @@ def measure_insert_time(data_type, number_of_operation, elements, time, repeats)
                 prio_queue = OrderedLinkedList()
             else:
                 prio_queue = LinkedList()
-            # for e in elements[:i]:
-            #     prio_queue.insert(e)
-
-            # new_value = elements[i]
-            start = timer()
             for e in elements[:i]:
-                copy = prio_queue
                 prio_queue.insert(e)
-                prio_queue = copy
+
+            new_value = elements[i]
+            start = timer()
+            prio_queue.insert(new_value)
             end = timer()
-            best = min(best, (end - start) / i)
+            best = min(best, end - start)
         # if len(time) == 0:
         #     time.append(best)
         # else:
@@ -479,6 +476,7 @@ def remove_max_test(
     number_of_repeats,
     inputs,
 ):
+
     time = []
     for k in number_of_operation:
         best = inf
@@ -493,12 +491,9 @@ def remove_max_test(
                 prio_queue.insert(e)
 
             start = timer()
-            for _ in inputs[:k]:
-                copy = prio_queue
-                prio_queue.remove_max()
-                prio_queue = copy
+            prio_queue.remove_max()
             end = timer()
-            best = min(best, (end - start) / k)
+            best = min(best, end - start)
         # if len(time) == 0:
         #     time.append(best)
         # else:
@@ -573,7 +568,7 @@ for i in [1, 2]:
 print("# Testing Insertion cases, only Heap and LinkedList")
 types_to_test = [0, 2]
 insert_test(
-    1,
+    2,
     types_to_test,
     number_of_elements,
     number_of_operation,
