@@ -26,7 +26,10 @@ class Heap:
         if right < n and self.heap[right] > self.heap[largest]:
             largest = right
         if largest != i:
-            self.heap[i], self.heap[largest] = self.heap[largest], self.heap[i]
+            swapped = self.heap[i]
+            self.heap[i] = self.heap[largest]
+            self.heap[largest] = swapped
+            # self.heap[i], self.heap[largest] = self.heap[largest], self.heap[i]
             self.heapify(largest)
 
     def insert(self, x):
@@ -405,37 +408,43 @@ def measure_insert_time(data_type, number_of_operation, elements, time, repeats)
                 prio_queue = OrderedLinkedList()
             else:
                 prio_queue = LinkedList()
-            for e in elements[:i]:
-                prio_queue.insert(e)
+            # for e in elements[:i]:
+            #     prio_queue.insert(e)
 
-            new_value = elements[i]
+            # new_value = elements[i]
             start = timer()
-            prio_queue.insert(new_value)
+            for e in elements[:i]:
+                copy = prio_queue
+                prio_queue.insert(e)
+                prio_queue = copy
             end = timer()
-            best = min(best, end - start)
-        if len(time) == 0:
-            time.append(best)
-        else:
-            time.append(best + time[-1])
+            best = min(best, (end - start) / i)
+        # if len(time) == 0:
+        #     time.append(best)
+        # else:
+        #     time.append(best + time[-1])
+        time.append(best)
     plot_graph(data_type, number_of_operation, time)
 
 
-def insert_test(test_type, types_to_test):
-    number_of_elements = 300
-    step = 1
-    number_of_operation = range(step, number_of_elements, step)
-    interval_end = 300
-    number_of_repeats = 10
-
+def insert_test(
+    test_type,
+    types_to_test,
+    number_of_elements,
+    number_of_operation,
+    interval_end,
+    number_of_repeats,
+    inputs,
+):
     # Testing insertion of highest value
     if test_type == 1:
         test_type_string = "highest"
-        inputs = range(interval_end)
+        inputs = range(number_of_elements)
         print("## Testing insertion of highest value")
     # Testing insertion of lowest value
     elif test_type == 2:
         test_type_string = "lowest"
-        inputs = range(interval_end, 0, -1)
+        inputs = range(number_of_elements, 0, -1)
         print("## Testing insertion of lowest value")
     else:
         # Testing insertion of random value
@@ -464,14 +473,12 @@ def insert_test(test_type, types_to_test):
     plt.clf()
 
 
-def remove_max_test(data_type):
-    number_of_elements = 300
-    step = 1
-    number_of_operation = range(step, number_of_elements, step)
-    interval_end = 300
-    number_of_repeats = 100
-    inputs = random.choices(range(interval_end), k=number_of_elements)
-
+def remove_max_test(
+    data_type,
+    number_of_operation,
+    number_of_repeats,
+    inputs,
+):
     time = []
     for k in number_of_operation:
         best = inf
@@ -482,28 +489,32 @@ def remove_max_test(data_type):
                 prio_queue = OrderedLinkedList()
             else:
                 prio_queue = LinkedList()
-            for _ in inputs[:k]:
-                prio_queue.insert(k)
+            for e in inputs[:k]:
+                prio_queue.insert(e)
 
             start = timer()
-            prio_queue.remove_max()
+            for _ in inputs[:k]:
+                copy = prio_queue
+                prio_queue.remove_max()
+                prio_queue = copy
             end = timer()
-            best = min(best, end - start)
-        if len(time) == 0:
-            time.append(best)
-        else:
-            time.append(best + time[-1])
+            best = min(best, (end - start) / k)
+        # if len(time) == 0:
+        #     time.append(best)
+        # else:
+        #     time.append(best + time[-1])
+        time.append(best)
 
     plot_graph(data_type, number_of_operation, time)
 
 
-def increase_key_test(data_type):
-    number_of_elements = 300
-    step = 1
-    number_of_operation = range(step, number_of_elements, step)
-    interval_end = 3000
-    number_of_repeats = 100
-    inputs = random.choices(range(interval_end), k=number_of_elements)
+def increase_key_test(
+    data_type,
+    number_of_operation,
+    interval_end,
+    number_of_repeats,
+    inputs,
+):
     time = []
 
     for k in number_of_operation:
@@ -515,8 +526,8 @@ def increase_key_test(data_type):
                 prio_queue = OrderedLinkedList()
             else:
                 prio_queue = LinkedList()
-            for _ in inputs[:k]:
-                prio_queue.insert(k)
+            for e in inputs[:k]:
+                prio_queue.insert(e)
 
             # TODO decide which test makes more sense. probably the worst case scenario
             # random_index = random.choice(range(k))
@@ -529,27 +540,56 @@ def increase_key_test(data_type):
             prio_queue.increase_key(random_index, random_value)
             end = timer()
             best = min(best, end - start)
-        if len(time) == 0:
-            time.append(best)
-        else:
-            time.append(best + time[-1])
+        # if len(time) == 0:
+        #     time.append(best)
+        # else:
+        #     time.append(best + time[-1])
+        time.append(best)
 
     plot_graph(data_type, number_of_operation, time)
 
 
-# also do a graph for highest/lowest between Heap and LinkedList
+number_of_elements = 3000
+step = 100
+number_of_operation = range(step, number_of_elements, step)
+interval_end = 3000
+number_of_repeats = 5
+inputs = random.choices(range(interval_end), k=number_of_elements)
+
+# TODO remove testing lowest, same results as random
 print("# Testing Insertion cases")
 types_to_test = range(3)
-for i in range(3):
-    insert_test(i, types_to_test)
+for i in [1, 2]:
+    insert_test(
+        i,
+        types_to_test,
+        number_of_elements,
+        number_of_operation,
+        interval_end,
+        number_of_repeats,
+        inputs,
+    )
 
 print("# Testing Insertion cases, only Heap and LinkedList")
 types_to_test = [0, 2]
-insert_test(0, types_to_test)
+insert_test(
+    1,
+    types_to_test,
+    number_of_elements,
+    number_of_operation,
+    interval_end,
+    number_of_repeats,
+    inputs,
+)
 
 print("# Testing Remove_Max")
 for i in range(3):
-    remove_max_test(i)
+    remove_max_test(
+        i,
+        number_of_operation,
+        number_of_repeats,
+        inputs,
+    )
 
 # also make a graph for only heap and OrderedLinkedList
 plt.title("Remove_Max Performance")
@@ -562,7 +602,12 @@ plt.clf()
 
 print("# Testing Remove_Max, only Heap and OrderedLinkedList")
 for i in range(2):
-    remove_max_test(i)
+    remove_max_test(
+        i,
+        number_of_operation,
+        number_of_repeats,
+        inputs,
+    )
 
 # also make a graph for only heap and OrderedLinkedList
 plt.title("Remove_Max Performance")
@@ -575,7 +620,13 @@ plt.clf()
 
 print("# Testing Increase_key")
 for i in range(3):
-    increase_key_test(i)
+    increase_key_test(
+        i,
+        number_of_operation,
+        interval_end,
+        number_of_repeats,
+        inputs,
+    )
 
 plt.title("Increase_key Performance")
 plt.xlabel("Size")
