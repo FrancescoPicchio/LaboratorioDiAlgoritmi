@@ -29,7 +29,6 @@ class Heap:
             swapped = self.heap[i]
             self.heap[i] = self.heap[largest]
             self.heap[largest] = swapped
-            # self.heap[i], self.heap[largest] = self.heap[largest], self.heap[i]
             self.heapify(largest)
 
     def insert(self, x):
@@ -398,31 +397,6 @@ def plot_graph(data_type, number_of_operation, time):
     print("-- finished testing for " + label)
 
 
-# def measure_insert_time(data_type, number_of_operation, elements, time, repeats):
-#     for i in number_of_operation:
-#         best = inf
-#         for _ in range(repeats):
-#             if data_type == 0:
-#                 prio_queue = Heap()
-#             elif data_type == 1:
-#                 prio_queue = OrderedLinkedList()
-#             else:
-#                 prio_queue = LinkedList()
-#             start = timer()
-#             for e in elements[:i]:
-#                 prio_queue.insert(e)
-#             end = timer()
-#             best = min(best, end - start)
-#
-#         # if len(time) == 0:
-#         #     time.append(best)
-#         # else:
-#         #     time.append(best + time[-1])
-#         time.append(best)
-#     plot_graph(data_type, number_of_operation, time)
-#
-
-
 def measure_insert_time(data_type, number_of_operation, elements, time, repeats):
     if data_type == 0:
         prio_queue = Heap()
@@ -442,10 +416,6 @@ def measure_insert_time(data_type, number_of_operation, elements, time, repeats)
                 break
             prio_queue.remove(new_value)
 
-        # if len(time) == 0:
-        #     time.append(best)
-        # else:
-        #     time.append(best + time[-1])
         time.append(best)
     plot_graph(data_type, number_of_operation, time)
 
@@ -520,10 +490,6 @@ def remove_max_test(
             prio_queue.remove_max()
             end = timer()
             best = min(best, end - start)
-        # if len(time) == 0:
-        #     time.append(best)
-        # else:
-        #     time.append(best + time[-1])
         time.append(best)
 
     plot_graph(data_type, number_of_operation, time)
@@ -550,8 +516,6 @@ def increase_key_test(
             for e in inputs[:k]:
                 prio_queue.insert(e)
 
-            # TODO decide which test makes more sense. probably the worst case scenario
-            # random_index = random.choice(range(k))
             random_index = k - 1
             value = prio_queue.get_value(random_index)
             if value is None:
@@ -561,10 +525,6 @@ def increase_key_test(
             prio_queue.increase_key(random_index, random_value)
             end = timer()
             best = min(best, end - start)
-        # if len(time) == 0:
-        #     time.append(best)
-        # else:
-        #     time.append(best + time[-1])
         time.append(best)
 
     plot_graph(data_type, number_of_operation, time)
@@ -577,7 +537,6 @@ interval_end = 3000000
 number_of_repeats = 10
 inputs = random.choices(range(interval_end), k=number_of_elements)
 
-# TODO remove testing lowest, same results as random
 print("# Testing Insertion cases")
 types_to_test = range(3)
 for i in range(3):
@@ -603,80 +562,54 @@ insert_test(
     inputs,
 )
 
-# print("# Testing Remove_Max")
-# for i in range(3):
-#     remove_max_test(
-#         i,
-#         number_of_operation,
-#         number_of_repeats,
-#         inputs,
-#     )
-#
-# # also make a graph for only heap and OrderedLinkedList
-# plt.title("Remove_Max Performance")
-# plt.xlabel("Size")
-# plt.ylabel("time")
-# plt.legend(loc="upper left")
-# plt.tight_layout()
-# plt.savefig("remove_max_performance.png")
-# plt.clf()
-#
-# print("# Testing Remove_Max, only Heap and OrderedLinkedList")
-# for i in range(2):
-#     remove_max_test(
-#         i,
-#         number_of_operation,
-#         number_of_repeats,
-#         inputs,
-#     )
-#
-# # also make a graph for only heap and OrderedLinkedList
-# plt.title("Remove_Max Performance")
-# plt.xlabel("Size")
-# plt.ylabel("time")
-# plt.legend(loc="upper left")
-# plt.tight_layout()
-# plt.savefig("remove_max_performance_no_linked.png")
-# plt.clf()
-#
-# print("# Testing Increase_key")
-# for i in range(3):
-#     increase_key_test(
-#         i,
-#         number_of_operation,
-#         interval_end,
-#         number_of_repeats,
-#         inputs,
-#     )
-#
-# plt.title("Increase_key Performance")
-# plt.xlabel("Size")
-# plt.ylabel("time")
-# plt.legend(loc="upper left")
-# plt.tight_layout()
-# plt.savefig("increase_key_performance.png")
-# plt.clf()
-#
-# # # TODO maybe remove this?
-# # # Section to compare insert() in various cases for max_heap
-# # time = []
-# # inputs = range(number_of_elements)
-# # measure_insert_time(Heap, inputs, time, len(inputs), number_of_repeats)
-# # plt.plot(number_of_operation, time, "g", label="Increasing order")
-# #
-# # time = []
-# # inputs = list(reversed(inputs))
-# # measure_insert_time(Heap, inputs, time, len(inputs), number_of_repeats)
-# # plt.plot(number_of_operation, time, "r", label="Decreasing order")
-# #
-# # time = []
-# # measure_insert_time(Heap, inputs, time, len(inputs), number_of_repeats)
-# # plt.plot(number_of_operation, time, "b", label="Random order")
-# #
-# # plt.title("Insertion Performance Max_heap")
-# # plt.xlabel("Size")
-# # plt.ylabel("time")
-# # plt.legend(loc="upper left")
-# # plt.savefig("max_heap_performance.png")
-# #
-# # TODO make section for just searching for the max
+print("# Testing Remove_Max")
+for i in range(3):
+    remove_max_test(
+        i,
+        number_of_operation,
+        number_of_repeats,
+        inputs,
+    )
+
+plt.title("Remove_Max Performance")
+plt.xlabel("Size")
+plt.ylabel("time")
+plt.legend(loc="upper left")
+plt.tight_layout()
+plt.savefig("remove_max_performance.png")
+plt.clf()
+
+print("# Testing Remove_Max, only Heap and OrderedLinkedList")
+for i in range(2):
+    remove_max_test(
+        i,
+        number_of_operation,
+        number_of_repeats,
+        inputs,
+    )
+
+plt.title("Remove_Max Performance")
+plt.xlabel("Size")
+plt.ylabel("time")
+plt.legend(loc="upper left")
+plt.tight_layout()
+plt.savefig("remove_max_performance_no_linked.png")
+plt.clf()
+
+print("# Testing Increase_key")
+for i in range(3):
+    increase_key_test(
+        i,
+        number_of_operation,
+        interval_end,
+        number_of_repeats,
+        inputs,
+    )
+
+plt.title("Increase_key Performance")
+plt.xlabel("Size")
+plt.ylabel("time")
+plt.legend(loc="upper left")
+plt.tight_layout()
+plt.savefig("increase_key_performance.png")
+plt.clf()
