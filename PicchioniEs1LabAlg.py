@@ -530,10 +530,10 @@ def increase_key_test(
     plot_graph(data_type, number_of_operation, time)
 
 
-number_of_elements = 3000
-step = 100
+number_of_elements = 300
+step = 1
 number_of_operation = range(step, number_of_elements, step)
-interval_end = 3000000
+interval_end = 30000
 number_of_repeats = 10
 inputs = random.choices(range(interval_end), k=number_of_elements)
 
