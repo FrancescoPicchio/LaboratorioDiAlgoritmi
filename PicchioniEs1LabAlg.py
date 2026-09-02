@@ -398,24 +398,22 @@ def plot_graph(data_type, number_of_operation, time):
 
 
 def measure_insert_time(data_type, number_of_operation, elements, time, repeats):
-    if data_type == 0:
-        prio_queue = Heap()
-    elif data_type == 1:
-        prio_queue = OrderedLinkedList()
-    else:
-        prio_queue = LinkedList()
     for i in number_of_operation:
         best = inf
-        for j in range(repeats):
+        for _ in range(repeats):
+            if data_type == 0:
+                prio_queue = Heap()
+            elif data_type == 1:
+                prio_queue = OrderedLinkedList()
+            else:
+                prio_queue = LinkedList()
+            for e in elements[: i - 1]:
+                prio_queue.insert(e)
             new_value = elements[i]
             start = timer()
             prio_queue.insert(new_value)
             end = timer()
             best = min(best, end - start)
-            if j == repeats - 1:
-                break
-            prio_queue.remove(new_value)
-
         time.append(best)
     plot_graph(data_type, number_of_operation, time)
 
@@ -428,22 +426,23 @@ def insert_test(
     interval_end,
     number_of_repeats,
     inputs,
+    test_name=None,
 ):
     # Testing insertion of highest value
     if test_type == 1:
-        test_type_string = "highest"
+        test_type_string = "ascending"
         inputs = range(number_of_elements)
-        print("## Testing insertion of highest value")
+        print("## Testing insertion of ascending values")
     # Testing insertion of lowest value
     elif test_type == 2:
-        test_type_string = "lowest"
+        test_type_string = "descending"
         inputs = range(number_of_elements, 0, -1)
-        print("## Testing insertion of lowest value")
+        print("## Testing insertion of descending values")
     else:
         # Testing insertion of random value
         test_type_string = "random"
         inputs = random.choices(range(interval_end), k=number_of_elements)
-        print("## Testing insertion of a random value")
+        print("## Testing insertion of random values")
 
     for i in types_to_test:
         time = []
@@ -455,9 +454,10 @@ def insert_test(
             number_of_repeats,
         )
 
-    plt.title("Insertion Performance, " + test_type_string + " value")
-    if len(types_to_test) < 3:
-        test_type_string = "no_ordered"
+    if test_name is not None:
+        test_type_string = test_name
+
+    plt.title("Insertion Performance, " + test_type_string + " values")
     plt.xlabel("Size")
     plt.ylabel("time")
     plt.legend(loc="upper left")
@@ -530,16 +530,16 @@ def increase_key_test(
     plot_graph(data_type, number_of_operation, time)
 
 
-number_of_elements = 300
-step = 1
+number_of_elements = 3000
+step = 50
 number_of_operation = range(step, number_of_elements, step)
 interval_end = 30000
-number_of_repeats = 10
+number_of_repeats = 5
 inputs = random.choices(range(interval_end), k=number_of_elements)
 
 print("# Testing Insertion cases")
 types_to_test = range(3)
-for i in range(3):
+for i in range(1, 3):
     insert_test(
         i,
         types_to_test,
@@ -550,7 +550,20 @@ for i in range(3):
         inputs,
     )
 
-print("# Testing Insertion cases, only Heap and LinkedList")
+print("# Testing Insertion of random values, only Heap and LinkedList")
+types_to_test = [0, 2]
+insert_test(
+    0,  # test for random values
+    types_to_test,
+    number_of_elements,
+    number_of_operation,
+    interval_end,
+    number_of_repeats,
+    inputs,
+    "random_no_ord",
+)
+
+print("# Testing Insertion of ascending values, only Heap and LinkedList")
 types_to_test = [0, 2]
 insert_test(
     1,
@@ -560,6 +573,7 @@ insert_test(
     interval_end,
     number_of_repeats,
     inputs,
+    "acending_no_ord",
 )
 
 print("# Testing Remove_Max")
