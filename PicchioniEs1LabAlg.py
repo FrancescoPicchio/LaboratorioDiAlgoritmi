@@ -455,9 +455,10 @@ def insert_test(
             time,
             number_of_repeats,
         )
+        # Saves the graph without the OrderedLinkedList in separate files
         if test_name is not None and i == types_to_test[1]:
             plt.title(
-                "Insertion Performance, " + test_type_string + test_name + " values"
+                "Insertion Performance, " + test_name + test_type_string + " values"
             )
             plt.xlabel("Size")
             plt.ylabel("time")
@@ -467,6 +468,7 @@ def insert_test(
                 "insertion_performance_" + test_type_string + test_name + ".png"
             )
 
+    # Saves the graph with all three data structures
     plt.title("Insertion Performance, " + test_type_string + " values")
     plt.xlabel("Size")
     plt.ylabel("time")
@@ -526,13 +528,14 @@ def increase_key_test(
             for e in inputs[:k]:
                 prio_queue.insert(e)
 
-            random_index = k - 1
-            value = prio_queue.get_value(random_index)
+            target_index = k - 1
+            value = prio_queue.get_value(target_index)
             if value is None:
                 value = 0
             random_value = random.choice(range(value, interval_end))
+
             start = timer()
-            prio_queue.increase_key(random_index, random_value)
+            prio_queue.increase_key(target_index, random_value)
             end = timer()
             best = min(best, end - start)
         time.append(best)
@@ -548,9 +551,17 @@ number_of_repeats = 5
 inputs = random.choices(range(interval_end), k=number_of_elements)
 
 print("# Testing Insertion cases")
-types_to_test = [0, 2, 1]
+types_to_test = [
+    0,
+    2,
+    1,
+]  # sorted like this to have the order for the data structures be Heap, LinkedList and lastly OrderedLinkedList
+
+# the range indicates the types of sets that will be inserted
+# 0 random values, 1 ascending values, 2 descending values
 for i in range(3):
     test_name = None
+    # this is done to save a version of the graph without the OrderedLinkedList
     if i != 2:
         test_name = "no_linked_" + str(i)
 
@@ -567,6 +578,7 @@ for i in range(3):
 
 
 print("# Testing Remove_Max")
+# range indicates it'll test all three types of data structures
 for i in range(3):
     remove_max_test(
         i,
@@ -609,3 +621,5 @@ plt.legend(loc="upper left")
 plt.tight_layout()
 plt.savefig("increase_key_performance.png")
 plt.clf()
+
+# TODO make tests to make a table for values
