@@ -537,44 +537,44 @@ interval_end = 30000
 number_of_repeats = 5
 inputs = random.choices(range(interval_end), k=number_of_elements)
 
-print("# Testing Insertion cases")
-types_to_test = range(3)
-for i in range(1, 3):
-    insert_test(
-        i,
-        types_to_test,
-        number_of_elements,
-        number_of_operation,
-        interval_end,
-        number_of_repeats,
-        inputs,
-    )
-
-print("# Testing Insertion of random values, only Heap and LinkedList")
-types_to_test = [0, 2]
-insert_test(
-    0,  # test for random values
-    types_to_test,
-    number_of_elements,
-    number_of_operation,
-    interval_end,
-    number_of_repeats,
-    inputs,
-    "random_no_ord",
-)
-
-print("# Testing Insertion of ascending values, only Heap and LinkedList")
-types_to_test = [0, 2]
-insert_test(
-    1,
-    types_to_test,
-    number_of_elements,
-    number_of_operation,
-    interval_end,
-    number_of_repeats,
-    inputs,
-    "acending_no_ord",
-)
+# print("# Testing Insertion cases")
+# types_to_test = range(3)
+# for i in range(3):
+#     insert_test(
+#         i,
+#         types_to_test,
+#         number_of_elements,
+#         number_of_operation,
+#         interval_end,
+#         number_of_repeats,
+#         inputs,
+#     )
+#
+# print("# Testing Insertion of random values, only Heap and LinkedList")
+# types_to_test = [0, 2]
+# insert_test(
+#     0,  # test for random values
+#     types_to_test,
+#     number_of_elements,
+#     number_of_operation,
+#     interval_end,
+#     number_of_repeats,
+#     inputs,
+#     "random_no_ord",
+# )
+#
+# print("# Testing Insertion of ascending values, only Heap and LinkedList")
+# types_to_test = [0, 2]
+# insert_test(
+#     1,
+#     types_to_test,
+#     number_of_elements,
+#     number_of_operation,
+#     interval_end,
+#     number_of_repeats,
+#     inputs,
+#     "acending_no_ord",
+# )
 
 print("# Testing Remove_Max")
 for i in range(3):
@@ -584,6 +584,13 @@ for i in range(3):
         number_of_repeats,
         inputs,
     )
+    if i == 1:  # case without linked list
+        plt.title("Remove_Max Performance")
+        plt.xlabel("Size")
+        plt.ylabel("time")
+        plt.legend(loc="upper left")
+        plt.tight_layout()
+        plt.savefig("remove_max_performance_no_linked.png")
 
 plt.title("Remove_Max Performance")
 plt.xlabel("Size")
@@ -593,22 +600,23 @@ plt.tight_layout()
 plt.savefig("remove_max_performance.png")
 plt.clf()
 
-print("# Testing Remove_Max, only Heap and OrderedLinkedList")
-for i in range(2):
-    remove_max_test(
-        i,
-        number_of_operation,
-        number_of_repeats,
-        inputs,
-    )
-
-plt.title("Remove_Max Performance")
-plt.xlabel("Size")
-plt.ylabel("time")
-plt.legend(loc="upper left")
-plt.tight_layout()
-plt.savefig("remove_max_performance_no_linked.png")
-plt.clf()
+# FIXME I could just plot the graph with the data I already have when I run it the first time
+# print("# Testing Remove_Max, only Heap and OrderedLinkedList")
+# for i in range(2):
+#     remove_max_test(
+#         i,
+#         number_of_operation,
+#         number_of_repeats,
+#         inputs,
+#     )
+#
+# plt.title("Remove_Max Performance")
+# plt.xlabel("Size")
+# plt.ylabel("time")
+# plt.legend(loc="upper left")
+# plt.tight_layout()
+# plt.savefig("remove_max_performance_no_linked.png")
+# plt.clf()
 
 print("# Testing Increase_key")
 for i in range(3):
