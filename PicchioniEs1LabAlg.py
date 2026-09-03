@@ -3,8 +3,6 @@ from time import perf_counter as timer
 import matplotlib.pyplot as plt
 import random
 
-from numpy import test
-
 
 class Heap:
     def __init__(self, arr=None):
@@ -61,13 +59,13 @@ class Heap:
         self.heapify(0)
         return max
 
-    def increase_key(self, i, key):
+    def increase_key(self, i, new_key):
         if i >= len(self.heap):
             print("index out of range")
             return
-        if key < self.heap[i]:
+        if new_key < self.heap[i]:
             return
-        self.heap[i] = key
+        self.heap[i] = new_key
         while i > 0 and self.heap[self.get_parent(i)] < self.heap[i]:
             swapped = self.heap[self.get_parent(i)]
             self.heap[self.get_parent(i)] = self.heap[i]
@@ -349,9 +347,9 @@ class OrderedLinkedList:
         self.head = self.head.get_next()
         return max
 
-    def increase_key(self, i, key):
+    def increase_key(self, i, new_key):
         self.remove_at_index(i)
-        self.insert(key)
+        self.insert(new_key)
 
     def get_len(self):
         node = self.head
