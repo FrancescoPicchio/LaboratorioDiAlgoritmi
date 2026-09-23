@@ -369,22 +369,24 @@ class OrderedLinkedList:
         print(result)
 
 
-class Tester:
+class Tests:
     def __init__(
         self,
-        inputs,
-        number_of_operation,
-        number_of_repeats,
-        interval_end,
-        number_of_elements,
+        intervals,
+        repeats,
+        max_value,
+        max_length,
     ):
-        self.number_of_operation = number_of_operation
-        self.repeats = number_of_repeats
-        self.interval_end = interval_end
-        self.inputs = inputs
-        self.number_of_elements = number_of_elements
+        self.intervals = intervals
+        self.repeats = repeats
+        self.max_value = max_value
+        self.inputs = random.choices(range(max_value), k=max_length)
+        self.max_length = max_length
 
-    def plot_graph(self, data_type, number_of_operation, time):
+    def random_inputs(self):
+        self.inputs = random.choices(range(max_value), k=max_length)
+
+    def plot_graph(self, data_type, time):
         if data_type == 0:
             label = "Heap"
             color = "r"
@@ -394,11 +396,11 @@ class Tester:
         else:
             label = "LinkedList"
             color = "b"
-        plt.plot(number_of_operation, time, color, label=label)
+        plt.plot(self.intervals, time, color, label=label)
         print("-- finished testing for " + label)
 
     def measure_insert_time(self, data_type, time):
-        for k in number_of_operation:
+        for k in intervals:
             best = inf
             for _ in range(self.repeats):
                 if data_type == 0:
@@ -415,7 +417,7 @@ class Tester:
                 end = timer()
                 best = min(best, end - start)
             time.append(best)
-        self.plot_graph(data_type, number_of_operation, time)
+        self.plot_graph(data_type, time)
 
     def insert_test(
         self,
@@ -426,19 +428,17 @@ class Tester:
         # Testing insertion of highest value
         if test_type == 1:
             test_type_string = "ascending"
-            self.inputs = range(self.number_of_elements)
+            self.inputs = range(self.max_length)
             print("## Testing insertion of ascending values")
         # Testing insertion of lowest value
         elif test_type == 2:
             test_type_string = "descending"
-            self.inputs = range(self.number_of_elements, 0, -1)
+            self.random_inputs()
             print("## Testing insertion of descending values")
         else:
             # Testing insertion of random value
             test_type_string = "random"
-            self.inputs = random.choices(
-                range(self.interval_end), k=self.number_of_elements
-            )
+            self.inputs = random.choices(range(self.max_value), k=self.max_length)
             print("## Testing insertion of random values")
 
         for i in types_to_test:
@@ -473,9 +473,9 @@ class Tester:
         self,
         data_type,
     ):
-
+        self.random_inputs()
         time = []
-        for k in self.number_of_operation:
+        for k in self.intervals:
             best = inf
             for _ in range(self.repeats):
                 if data_type == 0:
@@ -493,15 +493,16 @@ class Tester:
                 best = min(best, end - start)
             time.append(best)
 
-        self.plot_graph(data_type, self.number_of_operation, time)
+        self.plot_graph(data_type, time)
 
     def increase_key_test(
         self,
         data_type,
     ):
+        self.random_inputs()
         time = []
 
-        for k in self.number_of_operation:
+        for k in self.intervals:
             best = inf
             for _ in range(self.repeats):
                 if data_type == 0:
@@ -517,7 +518,7 @@ class Tester:
                 value = prio_queue.get_value(target_index)
                 if value is None:
                     value = 0
-                random_value = random.choice(range(value, self.interval_end))
+                random_value = random.choice(range(value, self.max_value))
 
                 start = timer()
                 prio_queue.increase_key(target_index, random_value)
@@ -525,18 +526,16 @@ class Tester:
                 best = min(best, end - start)
             time.append(best)
 
-        self.plot_graph(data_type, self.number_of_operation, time)
+        self.plot_graph(data_type, time)
 
 
-number_of_elements = 3000
+max_length = 3000
 step = 50
-number_of_operation = range(step, number_of_elements, step)
-interval_end = 30000
-number_of_repeats = 5
-inputs = random.choices(range(interval_end), k=number_of_elements)
-tester = Tester(
-    inputs, number_of_operation, number_of_repeats, interval_end, number_of_elements
-)
+intervals = range(step, max_length, step)
+max_value = 30000
+repeats = 5
+inputs = random.choices(range(max_value), k=max_length)
+tester = Tests(intervals, repeats, max_value, max_length)
 
 print("# Testing Insertion cases")
 types_to_test = [0, 2, 1]
@@ -548,7 +547,7 @@ for i in range(3):
     test_name = None
     # this is done to save a version of the graph without the OrderedLinkedList
     if i != 2:
-        test_name = "no_linked_" + str(i)
+        test_name = "_no_linked_" + str(i)
 
     tester.insert_test(i, types_to_test, test_name)
 
