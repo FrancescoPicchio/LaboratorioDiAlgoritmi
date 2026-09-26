@@ -3,6 +3,10 @@ from time import perf_counter as timer
 import matplotlib.pyplot as plt
 import random
 from copy import deepcopy
+import sys
+
+# to avoid hitting maximum recursion depth when running deepcopy(prio_queue)
+sys.setrecursionlimit(100000)
 
 
 class Heap:
@@ -381,8 +385,8 @@ class Tests:
         self.intervals = intervals
         self.repeats = repeats
         self.max_value = max_value
-        self.inputs = random.choices(range(max_value), k=max_length)
         self.max_length = max_length
+        self.random_inputs()
 
     def random_inputs(self):
         self.inputs = random.choices(range(max_value), k=max_length)
@@ -410,7 +414,8 @@ class Tests:
 
         for k in intervals:
             best = inf
-            prio_queue.insert(self.inputs[k])
+            for i in range(prio_queue.get_len(), k):
+                prio_queue.insert(self.inputs[i])
             for _ in range(self.repeats):
                 temp_prio = deepcopy(prio_queue)
                 new_value = self.inputs[k]
@@ -475,7 +480,6 @@ class Tests:
         self,
         data_type,
     ):
-        self.random_inputs()
         time = []
         if data_type == 0:
             prio_queue = Heap()
@@ -486,7 +490,8 @@ class Tests:
 
         for k in self.intervals:
             best = inf
-            prio_queue.insert(self.inputs[k])
+            for i in range(prio_queue.get_len(), k):
+                prio_queue.insert(self.inputs[i])
             for _ in range(self.repeats):
                 temp_prio = deepcopy(prio_queue)
                 start = timer()
@@ -501,7 +506,6 @@ class Tests:
         self,
         data_type,
     ):
-        self.random_inputs()
         time = []
         if data_type == 0:
             prio_queue = Heap()
@@ -512,7 +516,8 @@ class Tests:
 
         for k in self.intervals:
             best = inf
-            prio_queue.insert(self.inputs[k])
+            for i in range(prio_queue.get_len(), k):
+                prio_queue.insert(self.inputs[i])
             for _ in range(self.repeats):
                 temp_prio = deepcopy(prio_queue)
                 target_index = temp_prio.get_len() - 1
@@ -531,26 +536,13 @@ class Tests:
 
 
 max_length = 3000
-step = 50
+step = 100
 intervals = range(step, max_length, step)
 max_value = 30000
-repeats = 5
+repeats = 1
 inputs = random.choices(range(max_value), k=max_length)
 tester = Tests(intervals, repeats, max_value, max_length)
 
-print("# Testing Insertion cases")
-# this means that the order they'll be tested will be: Heap, LinkedList and, lastly, OrderedLinkedList
-types_to_test = [0, 2, 1]
-
-# the range indicates the types of sets that will be inserted
-# 0 random values, 1 ascending values, 2 descending values
-for i in range(3):
-    test_name = None
-    # this is done to save a version of the graph without the OrderedLinkedList
-    if i != 2:
-        test_name = "_no_linked_" + str(i)
-
-    tester.insert_test(i, types_to_test, test_name)
 
 print("# Testing Remove_Max")
 # range indicates it'll test all three types of data structures
@@ -585,4 +577,19 @@ plt.legend(loc="upper left")
 plt.tight_layout()
 plt.savefig("increase_key_performance.png")
 plt.clf()
+
+print("# Testing Insertion cases")
+# this means that the order they'll be tested will be: Heap, LinkedList and, lastly, OrderedLinkedList
+types_to_test = [0, 2, 1]
+
+# the range indicates the types of sets that will be inserted
+# 0 random values, 1 ascending values, 2 descending values
+for i in range(3):
+    test_name = None
+    # this is done to save a version of the graph without the OrderedLinkedList
+    if i != 2:
+        test_name = "_no_linked_"
+
+    tester.insert_test(i, types_to_test, test_name)
+
 # TODO make tests to make a table for values
