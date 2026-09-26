@@ -2,6 +2,7 @@ from math import inf, log, ceil
 from time import perf_counter as timer
 import matplotlib.pyplot as plt
 import random
+from copy import deepcopy
 
 
 class Heap:
@@ -400,20 +401,21 @@ class Tests:
         print("-- finished testing for " + label)
 
     def measure_insert_time(self, data_type, time):
+        if data_type == 0:
+            prio_queue = Heap()
+        elif data_type == 1:
+            prio_queue = OrderedLinkedList()
+        else:
+            prio_queue = LinkedList()
+
         for k in intervals:
             best = inf
+            prio_queue.insert(self.inputs[k])
             for _ in range(self.repeats):
-                if data_type == 0:
-                    prio_queue = Heap()
-                elif data_type == 1:
-                    prio_queue = OrderedLinkedList()
-                else:
-                    prio_queue = LinkedList()
-                for i in self.inputs[: k - 1]:
-                    prio_queue.insert(i)
+                temp_prio = deepcopy(prio_queue)
                 new_value = self.inputs[k]
                 start = timer()
-                prio_queue.insert(new_value)
+                temp_prio.insert(new_value)
                 end = timer()
                 best = min(best, end - start)
             time.append(best)
@@ -433,12 +435,12 @@ class Tests:
         # Testing insertion of lowest value
         elif test_type == 2:
             test_type_string = "descending"
-            self.random_inputs()
+            self.inputs = range(self.max_length, 0, -1)
             print("## Testing insertion of descending values")
         else:
             # Testing insertion of random value
             test_type_string = "random"
-            self.inputs = random.choices(range(self.max_value), k=self.max_length)
+            self.random_inputs()
             print("## Testing insertion of random values")
 
         for i in types_to_test:
@@ -475,20 +477,20 @@ class Tests:
     ):
         self.random_inputs()
         time = []
+        if data_type == 0:
+            prio_queue = Heap()
+        elif data_type == 1:
+            prio_queue = OrderedLinkedList()
+        else:
+            prio_queue = LinkedList()
+
         for k in self.intervals:
             best = inf
+            prio_queue.insert(self.inputs[k])
             for _ in range(self.repeats):
-                if data_type == 0:
-                    prio_queue = Heap()
-                elif data_type == 1:
-                    prio_queue = OrderedLinkedList()
-                else:
-                    prio_queue = LinkedList()
-                for i in self.inputs[:k]:
-                    prio_queue.insert(i)
-
+                temp_prio = deepcopy(prio_queue)
                 start = timer()
-                prio_queue.remove_max()
+                temp_prio.remove_max()
                 end = timer()
                 best = min(best, end - start)
             time.append(best)
@@ -501,27 +503,26 @@ class Tests:
     ):
         self.random_inputs()
         time = []
+        if data_type == 0:
+            prio_queue = Heap()
+        elif data_type == 1:
+            prio_queue = OrderedLinkedList()
+        else:
+            prio_queue = LinkedList()
 
         for k in self.intervals:
             best = inf
+            prio_queue.insert(self.inputs[k])
             for _ in range(self.repeats):
-                if data_type == 0:
-                    prio_queue = Heap()
-                elif data_type == 1:
-                    prio_queue = OrderedLinkedList()
-                else:
-                    prio_queue = LinkedList()
-                for i in self.inputs[:k]:
-                    prio_queue.insert(i)
-
-                target_index = k - 1
-                value = prio_queue.get_value(target_index)
+                temp_prio = deepcopy(prio_queue)
+                target_index = temp_prio.get_len() - 1
+                value = temp_prio.get_value(target_index)
                 if value is None:
                     value = 0
                 random_value = random.choice(range(value, self.max_value))
 
                 start = timer()
-                prio_queue.increase_key(target_index, random_value)
+                temp_prio.increase_key(target_index, random_value)
                 end = timer()
                 best = min(best, end - start)
             time.append(best)
@@ -538,8 +539,8 @@ inputs = random.choices(range(max_value), k=max_length)
 tester = Tests(intervals, repeats, max_value, max_length)
 
 print("# Testing Insertion cases")
+# this means that the order they'll be tested will be: Heap, LinkedList and, lastly, OrderedLinkedList
 types_to_test = [0, 2, 1]
-# sorted like this to have the order for the data structures be Heap, LinkedList and lastly OrderedLinkedList
 
 # the range indicates the types of sets that will be inserted
 # 0 random values, 1 ascending values, 2 descending values
@@ -551,13 +552,12 @@ for i in range(3):
 
     tester.insert_test(i, types_to_test, test_name)
 
-
 print("# Testing Remove_Max")
 # range indicates it'll test all three types of data structures
 for i in range(3):
     tester.remove_max_test(i)
 
-    if i == 1:  # case without linked list
+    if i == 1:  # case without linked list. save to separate file
         plt.title("Remove_Max Performance")
         plt.xlabel("Size")
         plt.ylabel("time")
@@ -585,5 +585,4 @@ plt.legend(loc="upper left")
 plt.tight_layout()
 plt.savefig("increase_key_performance.png")
 plt.clf()
-
 # TODO make tests to make a table for values
