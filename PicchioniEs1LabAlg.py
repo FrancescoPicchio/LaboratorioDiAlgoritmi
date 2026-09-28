@@ -36,13 +36,13 @@ class Heap:
             self.heap[largest] = swapped
             self.heapify(largest)
 
-    def insert(self, x):
+    def insert(self, key):
         self.heap.append(-inf)
-        self.increase_key(len(self.heap) - 1, x)
+        self.increase_key(len(self.heap) - 1, key)
 
-    def remove(self, x):
+    def remove(self, key):
         i = 0  # root node
-        while i < len(self.heap) and self.heap[i] != x:
+        while i < len(self.heap) and self.heap[i] != key:
             i += 1
         if i == len(self.heap):
             print("couldn't find match")
@@ -140,22 +140,21 @@ class LinkedList:
     def find_set(self):
         return self.head
 
-    # x is supposed to be data, not a Node
-    def insert(self, x):
-        new_node = Node(x, self, None)
+    def insert(self, key):
+        new_node = Node(key, self, None)
         if self.head is None:
             self.head = new_node
         else:
             self.tail.set_next(new_node)
         self.tail = new_node
 
-    def remove(self, x):
+    def remove(self, key):
         if self.head is None:
             print("error: list contains no elements")
         node = self.head
         previous = None
         while node is not None:
-            if node.get_data() == x:
+            if node.get_data() == key:
                 if previous is None:
                     self.head = node.get_next()
                 else:
@@ -229,9 +228,9 @@ class LinkedList:
         return i
 
     def get_value(self, i):
-        if self.head is None:
-            return
         node = self.head
+        if node is None:
+            return
         for _ in range(i):
             if node.get_next() is None:
                 return
@@ -258,12 +257,11 @@ class OrderedLinkedList:
         self.tail = tail
 
     def is_empty(self):
-        return self.head == None
+        return self.head is None
 
-    # x is supposed to be data, not a Node
-    def insert(self, x):
+    def insert(self, key):
         if self.head is None:
-            new_node = Node(x, self, None)
+            new_node = Node(key, self, None)
             self.head = new_node
             self.tail = new_node
             return
@@ -271,8 +269,8 @@ class OrderedLinkedList:
         node = self.head
         previous = None
         while node is not None:
-            if x >= node.get_data():
-                new_node = Node(x, self, node)
+            if key >= node.get_data():
+                new_node = Node(key, self, node)
                 if previous is not None:
                     previous.set_next(new_node)
                 else:
@@ -282,21 +280,21 @@ class OrderedLinkedList:
             else:
                 previous = node
                 if node.get_next() is None:
-                    new_node = Node(x, self, None)
+                    new_node = Node(key, self, None)
                     node.set_next(new_node)
                     return
                 else:
                     node = node.next
         print("error: no matching item to remove was found")
 
-    def remove(self, x):
+    def remove(self, key):
         if self.head is None:
             print("error: list contains no elements")
             return
         node = self.head
         previous = None
         while node is not None:
-            if node.get_data() == x:
+            if node.get_data() == key:
                 if previous is None:
                     self.head = node.get_next()
                 else:
@@ -429,8 +427,6 @@ class Tests:
     def insert_test(
         self,
         test_type,
-        types_to_test,
-        test_name=None,
     ):
         # Testing insertion of highest value
         if test_type == 1:
@@ -448,23 +444,21 @@ class Tests:
             self.random_inputs()
             print("## Testing insertion of random values")
 
-        for i in types_to_test:
+        # this means that the order they'll be tested will be: Heap, LinkedList and, lastly, OrderedLinkedList
+        for i in [0, 2, 1]:
             time = []
-            self.measure_insert_time(
-                i,
-                time,
-            )
+            self.measure_insert_time(i, time)
             # Saves the graph without the OrderedLinkedList in separate files
-            if test_name is not None and i == types_to_test[1]:
+            if i == 2:
                 plt.title(
-                    "Insertion Performance, " + test_name + test_type_string + " values"
+                    "Insertion Performance, " + "no ord" + test_type_string + " values"
                 )
                 plt.xlabel("Size")
                 plt.ylabel("time")
                 plt.legend(loc="upper left")
                 plt.tight_layout()
                 plt.savefig(
-                    "insertion_performance_" + test_type_string + test_name + ".png"
+                    "insertion_performance_" + test_type_string + "_no_ord" + ".png"
                 )
 
         # Saves the graph with all three data structures
@@ -540,7 +534,6 @@ step = 100
 intervals = range(step, max_length, step)
 max_value = 30000
 repeats = 1
-inputs = random.choices(range(max_value), k=max_length)
 tester = Tests(intervals, repeats, max_value, max_length)
 
 
@@ -579,17 +572,10 @@ plt.savefig("increase_key_performance.png")
 plt.clf()
 
 print("# Testing Insertion cases")
-# this means that the order they'll be tested will be: Heap, LinkedList and, lastly, OrderedLinkedList
-types_to_test = [0, 2, 1]
 
 # the range indicates the types of sets that will be inserted
 # 0 random values, 1 ascending values, 2 descending values
 for i in range(3):
-    test_name = None
-    # this is done to save a version of the graph without the OrderedLinkedList
-    if i != 2:
-        test_name = "_no_linked_"
-
-    tester.insert_test(i, types_to_test, test_name)
+    tester.insert_test(i)
 
 # TODO make tests to make a table for values
