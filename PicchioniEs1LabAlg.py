@@ -77,10 +77,6 @@ class Heap:
             self.heap[i] = swapped
             i = self.get_parent(i)
 
-    # works on the index of the element, not the value
-    def is_leaf(self, i):
-        return i > (len(self.heap) // 2) and i <= len(self.heap)
-
     def get_parent(self, i):
         return (i - 1) // 2
 
@@ -151,6 +147,7 @@ class LinkedList:
     def remove(self, key):
         if self.head is None:
             print("error: list contains no elements")
+            return
         node = self.head
         previous = None
         while node is not None:
@@ -166,6 +163,22 @@ class LinkedList:
                 previous = node
                 node = node.get_next()
         print("error: no matching item to remove was found")
+
+    def remove_at_index(self, i):
+        if i >= self.get_len():
+            print("error: index is greater than list length")
+            return
+        node = self.head
+        previous = None
+        for _ in range(i):
+            previous = node
+            node = node.get_next()
+        if previous is None:
+            self.head = node.get_next()
+        else:
+            previous.set_next(node.get_next())
+            if self.tail == node:
+                self.tail = previous
 
     def get_max(self):
         if self.head is None:
