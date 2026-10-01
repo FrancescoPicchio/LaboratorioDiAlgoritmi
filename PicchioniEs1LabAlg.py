@@ -132,9 +132,11 @@ class LinkedList:
     def __init__(self, head=None, tail=None):
         self.head = head
         self.tail = tail
-
-    def find_set(self):
-        return self.head
+        self.length = 0
+        if head is not None:
+            self.length += 1
+        if tail is not None:
+            self.length += 1
 
     def insert(self, key):
         new_node = Node(key, self, None)
@@ -143,6 +145,7 @@ class LinkedList:
         else:
             self.tail.set_next(new_node)
         self.tail = new_node
+        self.length += 1
 
     def remove(self, key):
         if self.head is None:
@@ -158,6 +161,7 @@ class LinkedList:
                     previous.set_next(node.get_next())
                     if self.tail == node:
                         self.tail = previous
+                self.length -= 1
                 return
             else:
                 previous = node
@@ -179,6 +183,7 @@ class LinkedList:
             previous.set_next(node.get_next())
             if self.tail == node:
                 self.tail = previous
+        self.length -= 1
 
     def get_max(self):
         if self.head is None:
@@ -216,7 +221,8 @@ class LinkedList:
             node_before_max.set_next(current_max_node.get_next())
         else:
             self.head = current_max_node.get_next()
-        return current_max_node
+        self.length -= 1
+        return current_max_value
 
     def increase_key(self, i, key):
         node = self.head
@@ -224,21 +230,16 @@ class LinkedList:
             print("list is empty")
             return
         for _ in range(i):
-            if node.next is None:
+            if node.get_next() is None:
                 print("index out of range")
                 return
-            node = node.next
-        if node.data > key:
+            node = node.get_next()
+        if node.get_data() > key:
             return
-        node.data = key
+        node.set_data(key)
 
     def get_len(self):
-        node = self.head
-        i = 0
-        while node is not None:
-            i += 1
-            node = node.get_next()
-        return i
+        return self.length
 
     def get_value(self, i):
         node = self.head
@@ -268,6 +269,11 @@ class OrderedLinkedList:
     def __init__(self, head=None, tail=None):
         self.head = head
         self.tail = tail
+        self.length = 0
+        if head is not None:
+            self.length += 1
+        if tail is not None:
+            self.length += 1
 
     def is_empty(self):
         return self.head is None
@@ -277,6 +283,7 @@ class OrderedLinkedList:
             new_node = Node(key, self, None)
             self.head = new_node
             self.tail = new_node
+            self.length += 1
             return
 
         node = self.head
@@ -286,19 +293,17 @@ class OrderedLinkedList:
                 new_node = Node(key, self, node)
                 if previous is not None:
                     previous.set_next(new_node)
-                else:
-                    self.head = new_node
-                    self.tail = node
+                    self.length += 1
                 return
             else:
                 previous = node
                 if node.get_next() is None:
                     new_node = Node(key, self, None)
                     node.set_next(new_node)
+                    self.length += 1
                     return
                 else:
                     node = node.next
-        print("error: no matching item to remove was found")
 
     def remove(self, key):
         if self.head is None:
@@ -314,6 +319,7 @@ class OrderedLinkedList:
                     previous.set_next(node.get_next())
                     if self.tail == node:
                         self.tail = previous
+                self.length -= 1
                 return
             else:
                 previous = node
@@ -338,28 +344,34 @@ class OrderedLinkedList:
             previous.set_next(node.get_next())
             if self.tail == node:
                 self.tail = previous
+        self.length -= 1
 
     def get_max(self):
-        return self.head
+        return self.head.get_data()
 
     def remove_max(self):
         if self.head is None:
             return
         max = self.head
         self.head = self.head.get_next()
-        return max
+        self.length -= 1
+        return max.get_data()
 
     def increase_key(self, i, new_key):
+        if self.get_value(i) > new_key:
+            print("error: new_key is lower than the current one")
+            return
         self.remove_at_index(i)
         self.insert(new_key)
 
     def get_len(self):
-        node = self.head
-        i = 0
-        while node is not None:
-            i += 1
-            node = node.get_next()
-        return i
+        return self.length
+        # node = self.head
+        # i = 0
+        # while node is not None:
+        #     i += 1
+        #     node = node.get_next()
+        # return i
 
     def get_value(self, i):
         node = self.head
