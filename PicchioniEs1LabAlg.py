@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import random
 from copy import deepcopy
 import sys
+import statistics
+
 
 # to avoid hitting maximum recursion depth when running deepcopy(prio_queue)
 sys.setrecursionlimit(100000)
@@ -17,6 +19,10 @@ class Heap:
         else:
             for x in arr:
                 self.insert(x)
+
+    def copy(self):
+        copy = Heap(self.heap)
+        return copy
 
     def is_empty(self):
         return len(self.heap) == 0
@@ -137,6 +143,14 @@ class LinkedList:
             self.length += 1
         if tail is not None:
             self.length += 1
+
+    def copy(self):
+        copy = LinkedList()
+        node = self.head
+        while node is not None:
+            copy.insert(node.get_data())
+            node = node.get_next()
+        return copy
 
     def insert(self, key):
         new_node = Node(key, self, None)
@@ -275,6 +289,20 @@ class OrderedLinkedList:
         if tail is not None:
             self.length += 1
 
+    def copy(self):
+        copy = OrderedLinkedList()
+        node = self.head
+        while node is not None:
+            copy.append(node.get_data())
+            node = node.get_next()
+        return copy
+
+    def append(self, value):
+        new_node = Node(value, self)
+        if self.tail is not None:
+            self.tail.set_next(new_node)
+        self.tail = new_node
+
     def is_empty(self):
         return self.head is None
 
@@ -366,12 +394,6 @@ class OrderedLinkedList:
 
     def get_len(self):
         return self.length
-        # node = self.head
-        # i = 0
-        # while node is not None:
-        #     i += 1
-        #     node = node.get_next()
-        # return i
 
     def get_value(self, i):
         node = self.head
@@ -409,10 +431,12 @@ class Tests:
         self.repeats = repeats
         self.max_value = max_value
         self.max_length = max_length
-        self.random_inputs()
+        self.randomize_inputs()
 
-    def random_inputs(self):
-        self.inputs = random.choices(range(max_value), k=max_length)
+    def randomize_inputs(self):
+        self.inputs = [
+            random.randint(1, self.max_value) for _ in range(self.max_length)
+        ]
 
     def plot_graph(self, data_type, time):
         if data_type == 0:
@@ -466,7 +490,7 @@ class Tests:
         else:
             # Testing insertion of random value
             test_type_string = "random"
-            self.random_inputs()
+            self.randomize_inputs()
             print("## Testing insertion of random values")
 
         # this means that the order they'll be tested will be: Heap, LinkedList and, lastly, OrderedLinkedList
@@ -553,6 +577,121 @@ class Tests:
 
         self.plot_graph(data_type, time)
 
+    # this tests how and if the time to insert changes in relation to max_value
+    def intervals_insertion_test(self, repeats):
+        results = []
+
+        data_structures = []
+        data_structures.append(Heap())
+        data_structures.append(LinkedList())
+        data_structures.append(OrderedLinkedList())
+
+        max_values_to_test = [100, 1000, 10000, 100000]
+        self.max_length = 1000
+        self.repeats = repeats
+
+        print("# Testing relation between time to insert and intervals")
+        for value in max_values_to_test:
+            print("- Testing for max value of: " + str(value))
+            self.max_value = value
+            self.randomize_inputs()
+            print("inputs is long " + str(len(self.inputs)))
+            test_value = random.choice(range(0, self.max_value))
+            time = []
+            measurements = []
+            for data_structure in data_structures:
+                print("-- Testing " + data_structure.__class__.__name__)
+                for i in self.inputs:
+                    data_structure.insert(i)
+                print(data_structure.get_len())
+                for _ in range(self.repeats):
+                    data_copy = deepcopy(data_structure)
+                    start = timer()
+                    data_copy.insert(test_value)
+                    end = timer()
+                    time.append(end - start)
+                measurements.append(statistics.median(time))
+            results.append(measurements)
+        return results
+
+    # this tests how and if the time to insert changes in relation to max_value
+    def intervals_remove_max_test(self, repeats):
+        results = []
+
+        data_structures = []
+        data_structures.append(Heap())
+        data_structures.append(LinkedList())
+        data_structures.append(OrderedLinkedList())
+
+        max_values_to_test = [100, 1000, 10000, 100000]
+        self.max_length = 1000
+        print("max len is " + str(self.max_length))
+        self.repeats = repeats
+
+        print("# Testing relation between time to remove the max and intervals")
+        for value in max_values_to_test:
+            print("- Testing for max value of: " + str(value))
+            self.max_value = value
+            self.randomize_inputs()
+            print("inputs is long " + str(len(self.inputs)))
+            time = []
+            measurements = []
+            for data_structure in data_structures:
+                print("-- Testing " + data_structure.__class__.__name__)
+                for i in self.inputs:
+                    data_structure.insert(i)
+                print("data is long " + str(data_structure.get_len()))
+                for _ in range(self.repeats):
+                    data_copy = deepcopy(data_structure)
+                    start = timer()
+                    data_copy.remove_max()
+                    end = timer()
+                    time.append(end - start)
+                measurements.append(statistics.median(time))
+            results.append(measurements)
+        return results
+
+    # this tests how and if the time to insert changes in relation to max_value
+    def intervals_increase_key_test(self, repeats):
+        results = []
+
+        data_structures = []
+        data_structures.append(Heap())
+        data_structures.append(LinkedList())
+        data_structures.append(OrderedLinkedList())
+
+        max_values_to_test = [100, 1000, 10000, 100000]
+        self.max_length = 1000
+        self.repeats = repeats
+
+        print("# Testing relation between time to increase a key and intervals")
+        for value in max_values_to_test:
+            print("- Testing for max value of: " + str(value))
+            self.max_value = value
+            self.randomize_inputs()
+            print("inputs is long " + str(len(self.inputs)))
+            time = []
+            measurements = []
+            for data_structure in data_structures:
+                print("-- Testing " + data_structure.__class__.__name__)
+                for i in self.inputs:
+                    data_structure.insert(i)
+                print("data is long " + str(data_structure.get_len()))
+                for _ in range(self.repeats):
+                    data_copy = deepcopy(data_structure)
+                    target_index = data_copy.get_len() - 1
+                    base_value = data_copy.get_value(target_index)
+                    if value is None:
+                        value = 0
+                    random_value = random.choice(range(base_value, self.max_value))
+                    start = timer()
+                    data_copy.increase_key(target_index, random_value)
+                    end = timer()
+                    time.append(end - start)
+                measurements.append(statistics.median(time))
+            results.append(measurements)
+        return results
+
 
 max_length = 3000
 step = 100
@@ -603,4 +742,9 @@ print("# Testing Insertion cases")
 for i in range(3):
     tester.insert_test(i)
 
-# TODO make tests to make a table for values
+measurements = tester.intervals_increase_key_test(200)
+print(measurements)
+measurements = tester.intervals_insertion_test(200)
+print(measurements)
+measurements = tester.intervals_remove_max_test(200)
+print(measurements)
